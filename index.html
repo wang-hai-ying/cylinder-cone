@@ -308,13 +308,13 @@ drawSweep();
 
 // ===== 3D 探究 =====
 const cvExplore=$('cvExplore'),ctxE=cvExplore.getContext('2d');
-let exploreShape='cylinder',eR=3,eH=5,eDrag=false,eAngleX=-0.3,eAngleY=0.35,eLastX=0,eLastY=0;
+let exploreShape='cylinder',eR=3,eH=5,eDrag=false,eAngleX=-0.15,eAngleY=0.25,eLastX=0,eLastY=0;
 
 function drawExplore(){
   const W=cvExplore.width,H=cvExplore.height;
   ctxE.clearRect(0,0,W,H);
   ctxE.fillStyle='#1a1a2e';ctxE.fillRect(0,0,W,H);
-  const cx=W/2,cy=H/2+20,scale=55;
+  const cx=W/2,cy=H/2+30,scale=55;
   const ax=eAngleX,ay=eAngleY,r=eR,h=eH;
 
   // Horizontal reference line
@@ -415,77 +415,79 @@ function drawUnfold(){
   ctxU.fillStyle='#1a1a2e';ctxU.fillRect(0,0,W,H);
 
   const r=uR,h=uH,t=uT;
-  const ax3d=-0.5,ay3d=0.7;
+  // Near-frontal view: cylinder/cone standing straight
+  const ax3d=-0.12,ay3d=0.25;
   const px=25; // pixels per cm for 2D flat shapes
 
   if(unfoldShape==='cylinder'){
-    // 3D cylinder: center in left portion of canvas
+    // 3D cylinder centered in left portion
     const cx3d=170,cy3d=H/2+60,s3d=38;
     if(t<0.98){ctxU.globalAlpha=1-t;drawCylinder3D(ctxU,cx3d,cy3d,s3d,ax3d,ay3d,r,h,0,0,'rgba(255,140,0,0.5)','rgba(255,160,40,0.6)');ctxU.globalAlpha=1;}
 
-    // Project the rightmost generatrix of the 3D cylinder (x=r, z=0, y from 0 to h)
+    // Project the rightmost generatrix (x=r, z=0, y=0..h)
     const genBot=project3D(r,0,0,cx3d,cy3d,s3d,ax3d,ay3d);
     const genTop=project3D(r,h,0,cx3d,cy3d,s3d,ax3d,ay3d);
+    const genX=genBot.sx; // generatrix screen X (nearly same for top/bot in front view)
+    const genSyr=genTop.sy; // top of generatrix (smaller Y = higher on screen)
+    const genSyb=genBot.sy; // bottom of generatrix
 
-    // Rectangle dimensions
+    // Rectangle: left edge at generatrix X, aligned with generatrix vertically
     const rectW=2*PI*r*px*t;
     const rectH=h*px;
-    const circR=r*px;
 
-    // Place rectangle so its left edge IS the generatrix line
-    // The rectangle extends rightward from the generatrix
-    const rectL=genBot.sx; // left edge of rectangle = generatrix x
-    const rectT=(genBot.sy+genTop.sy)/2-rectH/2; // center vertically with generatrix
+    // Position rectangle so its left edge matches the generatrix line,
+    // and vertically centered at the generatrix mid-point
+    const rectL=genX;
+    const rectT=(genSyr+genSyb)/2-rectH/2;
+    const rectB=rectT+rectH;
 
     if(rectW>1){
       ctxU.fillStyle='rgba(255,210,0,0.5)';ctxU.strokeStyle='#ffd200';ctxU.lineWidth=2;
       ctxU.fillRect(rectL,rectT,rectW,rectH);
       ctxU.strokeRect(rectL,rectT,rectW,rectH);
-      // Label: height = generatrix length
       ctxU.fillStyle='#fff';ctxU.font='12px sans-serif';ctxU.textAlign='center';
       if(rectW>50)ctxU.fillText('长=2πr='+(2*PI*r).toFixed(1)+'cm',rectL+rectW/2,rectT-6);
-      // Width label on left edge
+      // Width = height = h
       ctxU.save();ctxU.textAlign='right';
       ctxU.translate(rectL-4,rectT+rectH/2);ctxU.rotate(-PI/2);
-      ctxU.fillText('宽=高='+h.toFixed(1)+'cm',0,0);ctxU.restore();
+      ctxU.fillText('高=h='+h.toFixed(1)+'cm',0,0);ctxU.restore();
     }
 
-    // Base circles: top and bottom, aligned with generatrix
+    // Top circle (上底)
+    const circR=r*px;
     const yGap=10;
-    // Top circle
     ctxU.fillStyle='rgba(79,195,247,0.45)';ctxU.strokeStyle='rgba(79,195,247,0.7)';ctxU.lineWidth=2;
     ctxU.beginPath();ctxU.arc(rectL+rectW/2,rectT-yGap-circR,circR,0,2*PI);ctxU.fill();ctxU.stroke();
     ctxU.fillStyle='#fff';ctxU.font='11px sans-serif';ctxU.textAlign='center';
     ctxU.fillText('上底(r='+r.toFixed(1)+')',rectL+rectW/2,rectT-yGap-circR-circR-4);
-    // Bottom circle
+    // Bottom circle (下底)
     ctxU.fillStyle='rgba(79,195,247,0.45)';ctxU.strokeStyle='rgba(79,195,247,0.7)';ctxU.lineWidth=2;
-    ctxU.beginPath();ctxU.arc(rectL+rectW/2,rectT+rectH+yGap+circR,circR,0,2*PI);ctxU.fill();ctxU.stroke();
-    ctxU.fillText('下底(r='+r.toFixed(1)+')',rectL+rectW/2,rectT+rectH+yGap+circR+circR+14);
+    ctxU.beginPath();ctxU.arc(rectL+rectW/2,rectB+yGap+circR,circR,0,2*PI);ctxU.fill();ctxU.stroke();
+    ctxU.fillText('下底(r='+r.toFixed(1)+')',rectL+rectW/2,rectB+yGap+circR+circR+14);
 
-    // Highlight the shared generatrix on the 3D model
+    // Dashed line showing shared generatrix
     if(t>0.01){
       ctxU.strokeStyle='rgba(255,255,255,0.5)';ctxU.lineWidth=1.5;ctxU.setLineDash([3,3]);
-      ctxU.beginPath();ctxU.moveTo(genBot.sx,genBot.sy);ctxU.lineTo(genTop.sx,genTop.sy);ctxU.stroke();
+      ctxU.beginPath();ctxU.moveTo(genX,genSyr);ctxU.lineTo(genX,genSyb);ctxU.stroke();
       ctxU.setLineDash([]);
     }
   }else{
-    // 3D cone: center in left portion
+    // 3D cone centered in left portion
     const cx3d=160,cy3d=H/2+60,s3d=42;
     if(t<0.98){ctxU.globalAlpha=1-t;drawCone3D(ctxU,cx3d,cy3d,s3d,ax3d,ay3d,r,h,0,0,'rgba(79,195,247,0.5)','rgba(100,210,255,0.6)');ctxU.globalAlpha=1;}
 
-    // Project key points of the 3D cone
+    // Project cone key points
     const apex=project3D(0,h/2,0,cx3d,cy3d,s3d,ax3d,ay3d);
-    const basePt=project3D(r,-h/2,0,cx3d,cy3d,s3d,ax3d,ay3d); // rightmost base point
+    const basePt=project3D(r,-h/2,0,cx3d,cy3d,s3d,ax3d,ay3d);
 
-    // Flat shapes: sector centered at apex, radius along generatrix
+    // Sector: radius=slant, center at apex
     const slant=Math.sqrt(r*r+h*h);
     const arcAngle=(2*PI*r/slant)*t;
     const secR=slant*px;
     const circR=r*px;
 
-    // Sector: apex at same screen position as 3D apex, one radius along the projected generatrix
     if(arcAngle>0.01&&t>0.01){
-      // The generatrix from 3D goes from basePt to apex. The sector's radius should align with it.
+      // Sector's first radius aligns with the 3D generatrix from apex to basePt
       const genAngle=Math.atan2(basePt.sy-apex.sy,basePt.sx-apex.sx);
       ctxU.fillStyle='rgba(255,210,0,0.5)';ctxU.strokeStyle='#ffd200';ctxU.lineWidth=2;
       ctxU.beginPath();
@@ -493,21 +495,20 @@ function drawUnfold(){
       ctxU.arc(apex.sx,apex.sy,secR,genAngle,genAngle+arcAngle);
       ctxU.closePath();ctxU.fill();ctxU.stroke();
 
-      // Labels
       ctxU.fillStyle='#fff';ctxU.font='11px sans-serif';ctxU.textAlign='center';
       const midA=genAngle+arcAngle/2;
-      ctxU.fillText('半径=母线='+slant.toFixed(1)+'cm',apex.sx+secR*0.45*Math.cos(midA),apex.sy+secR*0.45*Math.sin(midA));
-      ctxU.fillText('弧长=2πr='+(2*PI*r).toFixed(1)+'cm',apex.sx+secR*0.75*Math.cos(genAngle+arcAngle*0.7),apex.sy+secR*0.75*Math.sin(genAngle+arcAngle*0.7));
+      ctxU.fillText('母线='+slant.toFixed(1)+'cm',apex.sx+secR*0.4*Math.cos(midA),apex.sy+secR*0.4*Math.sin(midA));
+      ctxU.fillText('弧长=2πr='+(2*PI*r).toFixed(1)+'cm',apex.sx+secR*0.7*Math.cos(genAngle+arcAngle*0.7),apex.sy+secR*0.7*Math.sin(genAngle+arcAngle*0.7));
     }
 
-    // Base circle: aligned with the base of the generatrix
+    // Base circle
     ctxU.fillStyle='rgba(79,195,247,0.45)';ctxU.strokeStyle='rgba(79,195,247,0.7)';ctxU.lineWidth=2;
-    const circX=apex.sx+(basePt.sx-apex.sx)*0.5-secR-circR-10;
-    const circY=apex.sy+(basePt.sy-apex.sy)*0.5;
+    const circX=apex.sx+secR*Math.cos(-PI/2)*0.6-circR*2;
+    const circY=apex.sy+secR*0.55+circR+10;
     ctxU.beginPath();ctxU.arc(circX,circY,circR,0,2*PI);ctxU.fill();ctxU.stroke();
     ctxU.fillText('底面(r='+r.toFixed(1)+')',circX,circY+circR+14);
 
-    // Highlight the shared generatrix
+    // Highlight shared generatrix
     if(t>0.01){
       ctxU.strokeStyle='rgba(255,255,255,0.5)';ctxU.lineWidth=1.5;ctxU.setLineDash([3,3]);
       ctxU.beginPath();ctxU.moveTo(basePt.sx,basePt.sy);ctxU.lineTo(apex.sx,apex.sy);ctxU.stroke();
