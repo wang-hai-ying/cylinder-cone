@@ -614,22 +614,22 @@ function genQ(){
   for(let t=0;t<50;t++){
     const tp=ri(1,4);let q=null;
     // Type 1: 已知r,h求圆柱体积（保留π）
-    if(tp===1){const r=ri(1,8),h=ri(2,10),ans=r*r*h;const ws=new Set([ans]);while(ws.size<4)ws.add(ans+ri(-8,8)*ri(1,3));q={t:`底面半径 <b>${r}</b> cm，高 <b>${h}</b> cm 的圆柱，体积是多少？（保留π）`,a:ans,opts:sh([...ws].filter(v=>v>0).slice(0,4))};}
+    if(tp===1){const r=ri(1,8),h=ri(2,10),ans=r*r*h;const ws=new Set([ans]);while(ws.size<4)ws.add(ans+ri(-8,8)*ri(1,3));q={t:`底面半径 <b>${r}</b> cm，高 <b>${h}</b> cm 的圆柱，体积是多少？（保留π）`,a:ans,unit:'cm³',opts:sh([...ws].filter(v=>v>0).slice(0,4))};}
     // Type 2: 已知r,h求圆锥体积（保留π）
-    else if(tp===2){const r=ri(1,6),h=ri(3,12),ans=r*r*h/3;if(ans!==Math.floor(ans))continue;const ws=new Set([ans]);while(ws.size<4){let w=ans+ri(-4,4)*ri(1,2);if(w>0)ws.add(w);}q={t:`底面半径 <b>${r}</b> cm，高 <b>${h}</b> cm 的圆锥，体积是多少？（保留π）`,a:ans,opts:sh([...ws].filter(v=>v>0).slice(0,4))};}
+    else if(tp===2){const r=ri(1,6),h=ri(3,12),ans=r*r*h/3;if(ans!==Math.floor(ans))continue;const ws=new Set([ans]);while(ws.size<4){let w=ans+ri(-4,4)*ri(1,2);if(w>0)ws.add(w);}q={t:`底面半径 <b>${r}</b> cm，高 <b>${h}</b> cm 的圆锥，体积是多少？（保留π）`,a:ans,unit:'cm³',opts:sh([...ws].filter(v=>v>0).slice(0,4))};}
     // Type 3: 反推
-    else if(tp===3){const r=ri(2,6),h=ri(2,8),v=r*r*h;if(Math.random()>0.5){const ws=new Set([r]);while(ws.size<4)ws.add(r+ri(-2,4));q={t:`圆柱体积为 <b>${formatPi(v)}</b> cm³，高 <b>${h}</b> cm。底面半径是多少 cm？`,a:r,opts:sh([...ws].filter(x=>x>0).slice(0,4))};}else{const ws=new Set([h]);while(ws.size<4)ws.add(h+ri(-3,6));q={t:`圆柱体积为 <b>${formatPi(v)}</b> cm³，半径 <b>${r}</b> cm。高是多少 cm？`,a:h,opts:sh([...ws].filter(x=>x>0).slice(0,4))};}}
+    else if(tp===3){const r=ri(2,6),h=ri(2,8),v=r*r*h;if(Math.random()>0.5){const ws=new Set([r]);while(ws.size<4)ws.add(r+ri(-2,4));q={t:`圆柱体积为 <b>${formatPi(v)}</b> cm³，高 <b>${h}</b> cm。底面半径是多少 cm？`,a:r,unit:'cm',opts:sh([...ws].filter(x=>x>0).slice(0,4))};}else{const ws=new Set([h]);while(ws.size<4)ws.add(h+ri(-3,6));q={t:`圆柱体积为 <b>${formatPi(v)}</b> cm³，半径 <b>${r}</b> cm。高是多少 cm？`,a:h,unit:'cm',opts:sh([...ws].filter(x=>x>0).slice(0,4))};}}
     // Type 4: 圆柱vs圆锥
-    else{const r=ri(2,7),h=ri(3,9),cv=r*r*h,ans=cv/3;if(ans!==Math.floor(ans))continue;q={t:`底面半径 <b>${r}</b> cm，高 <b>${h}</b> cm。等底等高圆柱体积为 <b>${formatPi(cv)}</b> cm³。圆锥体积是多少？`,a:ans,opts:sh([ans,Math.floor(cv*2/3),Math.floor(cv*0.4),Math.floor(cv*0.25)])};}
+    else{const r=ri(2,7),h=ri(3,9),cv=r*r*h,ans=cv/3;if(ans!==Math.floor(ans))continue;q={t:`底面半径 <b>${r}</b> cm，高 <b>${h}</b> cm。等底等高圆柱体积为 <b>${formatPi(cv)}</b> cm³。圆锥体积是多少？`,a:ans,unit:'cm³',opts:sh([ans,Math.floor(cv*2/3),Math.floor(cv*0.4),Math.floor(cv*0.25)])};}
     if(q&&q.opts.length>=3&&q.opts.length<=5)return q;
   }
-  return{t:'底面半径 3 cm，高 5 cm 的圆柱体积？（保留π）',a:45,opts:sh([45,15,90,135])};
+  return{t:'底面半径 3 cm，高 5 cm 的圆柱体积？（保留π）',a:45,unit:'cm³',opts:sh([45,15,90,135])};
 }
 
 $('startGameBtn2').addEventListener('click',()=>{gs=0;gt=0;$('gameScore').textContent='0';$('gameTotal').textContent='0';$('startGameBtn2').style.display='none';$('nextGameBtn2').style.display='inline-block';nextQ();});
 $('nextGameBtn2').addEventListener('click',nextQ);
 
-function nextQ(){gA=false;gQ=genQ();$('gameQuestion').innerHTML=gQ.t;$('gameFeedback').innerHTML='';$('gameOptions').innerHTML=gQ.opts.map(o=>`<button class="game-option">${formatPi(o)} cm³</button>`).join('');document.querySelectorAll('.game-option').forEach((b,i)=>b.addEventListener('click',()=>ansQ(i,b)));}
+function nextQ(){gA=false;gQ=genQ();$('gameQuestion').innerHTML=gQ.t;$('gameFeedback').innerHTML='';const u=gQ.unit||'cm³';$('gameOptions').innerHTML=gQ.opts.map(o=>`<button class="game-option">${formatPi(o)} ${u}</button>`).join('');document.querySelectorAll('.game-option').forEach((b,i)=>b.addEventListener('click',()=>ansQ(i,b)));}
 
 function ansQ(idx,btn){if(gA)return;gA=true;gt++;const ok=Math.abs(gQ.opts[idx]-gQ.a)<0.01;if(ok){gs++;btn.classList.add('correct');$('gameFeedback').innerHTML='✅ 正确！';}else{btn.classList.add('wrong');document.querySelectorAll('.game-option').forEach((b,i)=>{if(Math.abs(gQ.opts[i]-gQ.a)<0.01)b.classList.add('correct');});$('gameFeedback').innerHTML='❌ 再想想！';}$('gameScore').textContent=gs;$('gameTotal').textContent=gt;document.querySelectorAll('.game-option').forEach(b=>b.style.pointerEvents='none');}
 
