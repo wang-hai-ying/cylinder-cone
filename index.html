@@ -498,10 +498,11 @@ function drawUnfold(){
       ctxU.fillText('弧长=2πr='+(2*PI*r).toFixed(1)+'cm',apex.sx+secR*0.7*Math.cos(genAngle-arcAngle*0.7),apex.sy+secR*0.7*Math.sin(genAngle-arcAngle*0.7));
     }
 
-    // Base circle placed below the sector, horizontally centered
+    // Base circle: fixed position below the sector
     ctxU.fillStyle='rgba(79,195,247,0.45)';ctxU.strokeStyle='rgba(79,195,247,0.7)';ctxU.lineWidth=2;
-    const circX=(apex.sx+(apex.sx+secR*Math.cos(genAngle-arcAngle)))/2;
-    const circY=Math.max(apex.sy,apex.sy+secR*Math.sin(genAngle-arcAngle))+circR+16;
+    // Place it to the right of the sector, vertically centered
+    const circX=apex.sx+secR+circR+20;
+    const circY=apex.sy+(basePt.sy-apex.sy)/2;
     ctxU.beginPath();ctxU.arc(circX,circY,circR,0,2*PI);ctxU.fill();ctxU.stroke();
     ctxU.fillText('底面(r='+r.toFixed(1)+')',circX,circY+circR+14);
 
