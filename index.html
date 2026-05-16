@@ -417,7 +417,6 @@ function drawUnfold(){
   const r=uR,h=uH,t=uT;
   // Near-frontal view: cylinder/cone standing straight
   const ax3d=-0.12,ay3d=0.25;
-  const px=25; // pixels per cm for 2D flat shapes
 
   if(unfoldShape==='cylinder'){
     // 3D cylinder centered in left portion
@@ -427,19 +426,16 @@ function drawUnfold(){
     // Project the rightmost generatrix (x=r, z=0, y=0..h)
     const genBot=project3D(r,0,0,cx3d,cy3d,s3d,ax3d,ay3d);
     const genTop=project3D(r,h,0,cx3d,cy3d,s3d,ax3d,ay3d);
-    const genX=genBot.sx; // generatrix screen X (nearly same for top/bot in front view)
-    const genSyr=genTop.sy; // top of generatrix (smaller Y = higher on screen)
-    const genSyb=genBot.sy; // bottom of generatrix
+    const genX=genBot.sx;
+    const genLen=genBot.sy-genTop.sy; // screen length of generatrix
 
-    // Rectangle: left edge at generatrix X, aligned with generatrix vertically
+    // Set px so rectangle height exactly matches generatrix screen length
+    const px=genLen/h;
     const rectW=2*PI*r*px*t;
-    const rectH=h*px;
-
-    // Position rectangle so its left edge matches the generatrix line,
-    // and vertically centered at the generatrix mid-point
-    const rectL=genX;
-    const rectT=(genSyr+genSyb)/2-rectH/2;
-    const rectB=rectT+rectH;
+    const rectH=genLen; // exactly matches 3D generatrix
+    const circR=r*px;
+    // Position rectangle: left edge at generatrix X, top at generatrix top
+    const rectL=genX, rectT=genTop.sy, rectB=rectT+rectH;
 
     if(rectW>1){
       ctxU.fillStyle='rgba(255,210,0,0.5)';ctxU.strokeStyle='#ffd200';ctxU.lineWidth=2;
@@ -447,14 +443,12 @@ function drawUnfold(){
       ctxU.strokeRect(rectL,rectT,rectW,rectH);
       ctxU.fillStyle='#fff';ctxU.font='12px sans-serif';ctxU.textAlign='center';
       if(rectW>50)ctxU.fillText('长=2πr='+(2*PI*r).toFixed(1)+'cm',rectL+rectW/2,rectT-6);
-      // Width = height = h
       ctxU.save();ctxU.textAlign='right';
       ctxU.translate(rectL-4,rectT+rectH/2);ctxU.rotate(-PI/2);
       ctxU.fillText('高=h='+h.toFixed(1)+'cm',0,0);ctxU.restore();
     }
 
     // Top circle (上底)
-    const circR=r*px;
     const yGap=10;
     ctxU.fillStyle='rgba(79,195,247,0.45)';ctxU.strokeStyle='rgba(79,195,247,0.7)';ctxU.lineWidth=2;
     ctxU.beginPath();ctxU.arc(rectL+rectW/2,rectT-yGap-circR,circR,0,2*PI);ctxU.fill();ctxU.stroke();
@@ -465,10 +459,10 @@ function drawUnfold(){
     ctxU.beginPath();ctxU.arc(rectL+rectW/2,rectB+yGap+circR,circR,0,2*PI);ctxU.fill();ctxU.stroke();
     ctxU.fillText('下底(r='+r.toFixed(1)+')',rectL+rectW/2,rectB+yGap+circR+circR+14);
 
-    // Dashed line showing shared generatrix
+    // Dashed line on shared generatrix
     if(t>0.01){
       ctxU.strokeStyle='rgba(255,255,255,0.5)';ctxU.lineWidth=1.5;ctxU.setLineDash([3,3]);
-      ctxU.beginPath();ctxU.moveTo(genX,genSyr);ctxU.lineTo(genX,genSyb);ctxU.stroke();
+      ctxU.beginPath();ctxU.moveTo(genX,genTop.sy);ctxU.lineTo(genX,genBot.sy);ctxU.stroke();
       ctxU.setLineDash([]);
     }
   }else{
@@ -480,10 +474,13 @@ function drawUnfold(){
     const apex=project3D(0,h/2,0,cx3d,cy3d,s3d,ax3d,ay3d);
     const basePt=project3D(r,-h/2,0,cx3d,cy3d,s3d,ax3d,ay3d);
 
-    // Sector: radius=slant, center at apex
+    // Screen generatrix length → set px so sector radius matches exactly
+    const genDX=basePt.sx-apex.sx, genDY=basePt.sy-apex.sy;
+    const genLen=Math.sqrt(genDX*genDX+genDY*genDY);
     const slant=Math.sqrt(r*r+h*h);
+    const px=genLen/slant;
     const arcAngle=(2*PI*r/slant)*t;
-    const secR=slant*px;
+    const secR=genLen; // exactly matches 3D generatrix
     const circR=r*px;
 
     if(arcAngle>0.01&&t>0.01){
