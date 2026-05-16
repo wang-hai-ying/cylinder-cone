@@ -482,10 +482,10 @@ function drawUnfold(){
     const arcAngle=(2*PI*r/slant)*t;
     const secR=genLen; // exactly matches 3D generatrix
     const circR=r*px;
+    const genAngle=Math.atan2(basePt.sy-apex.sy,basePt.sx-apex.sx);
 
     if(arcAngle>0.01&&t>0.01){
       // Sector fans counterclockwise from generatrix (expands rightward)
-      const genAngle=Math.atan2(basePt.sy-apex.sy,basePt.sx-apex.sx);
       ctxU.fillStyle='rgba(255,210,0,0.5)';ctxU.strokeStyle='#ffd200';ctxU.lineWidth=2;
       ctxU.beginPath();
       ctxU.moveTo(apex.sx,apex.sy);
@@ -498,10 +498,10 @@ function drawUnfold(){
       ctxU.fillText('弧长=2πr='+(2*PI*r).toFixed(1)+'cm',apex.sx+secR*0.7*Math.cos(genAngle-arcAngle*0.7),apex.sy+secR*0.7*Math.sin(genAngle-arcAngle*0.7));
     }
 
-    // Base circle
+    // Base circle placed below the sector, horizontally centered
     ctxU.fillStyle='rgba(79,195,247,0.45)';ctxU.strokeStyle='rgba(79,195,247,0.7)';ctxU.lineWidth=2;
-    const circX=apex.sx+secR*Math.cos(-PI/2)*0.6-circR*2;
-    const circY=apex.sy+secR*0.55+circR+10;
+    const circX=(apex.sx+(apex.sx+secR*Math.cos(genAngle-arcAngle)))/2;
+    const circY=Math.max(apex.sy,apex.sy+secR*Math.sin(genAngle-arcAngle))+circR+16;
     ctxU.beginPath();ctxU.arc(circX,circY,circR,0,2*PI);ctxU.fill();ctxU.stroke();
     ctxU.fillText('底面(r='+r.toFixed(1)+')',circX,circY+circR+14);
 
