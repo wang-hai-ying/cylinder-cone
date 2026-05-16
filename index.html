@@ -5,21 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>圆柱与圆锥 — 数学探究实验室</title>
 <link rel="stylesheet" href="css/style.css">
-<script src="https://www.geogebra.org/apps/deployggb.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
 <style>
-.ggb-container { width:100%; height:500px; border-radius:16px; overflow:hidden; margin:15px 0; border:1px solid rgba(255,255,255,0.08); }
-.ggb-container .loading { text-align:center; padding:60px; color:#888; font-size:16px; }
-.ggb-container .loading .spin { display:inline-block; width:24px; height:24px; border:3px solid rgba(255,255,255,0.1); border-top-color:#f7971e; border-radius:50%; animation:sp 0.8s linear infinite; vertical-align:middle; margin-right:10px; }
-@keyframes sp { to{transform:rotate(360deg);} }
+.canvas-wrap { text-align:center; margin:15px 0; }
+canvas { display:block; margin:0 auto; max-width:100%; border-radius:14px; }
 </style>
 </head>
 <body>
 <div class="container">
-  <header>
-    <h1>🔷 圆柱与圆锥</h1>
-    <div class="subtitle">沪教版数学·六年级下册 第八章</div>
-  </header>
+  <header><h1>🔷 圆柱与圆锥</h1><div class="subtitle">沪教版数学·六年级下册 第八章</div></header>
   <div class="tabs" id="tabBar">
     <button class="tab-btn active" data-tab="rotate">🔄 面动成体</button>
     <button class="tab-btn" data-tab="explore">🔍 3D 探究</button>
@@ -29,23 +22,49 @@
     <button class="tab-btn" data-tab="game">🎮 闯关挑战</button>
   </div>
 
+  <!-- 面动成体 -->
   <div class="panel active" id="panel-rotate">
-    <div class="mode-switch">
-      <button class="mode-btn active" data-mode="cylinder">🔵 长方形 → 圆柱</button>
-      <button class="mode-btn" data-mode="cone">🔺 三角形 → 圆锥</button>
+    <div class="mode-switch" id="swRotate">
+      <button class="mode-btn active" data-mode="cylinder">🔵 长方形→圆柱</button>
+      <button class="mode-btn" data-mode="cone">🔺 三角形→圆锥</button>
     </div>
-    <div class="ggb-container"><div id="ggb-rotate" style="width:100%;height:100%;"><div class="loading"><span class="spin"></span>加载中...</div></div></div>
+    <div class="canvas-wrap"><canvas id="cvSweep" width="900" height="500"></canvas></div>
+    <div class="sweep-controls">
+      <button class="btn btn-primary" id="btnSweepPlay">▶ 播放</button>
+      <button class="btn btn-outline" id="btnSweepReset">🔄 重置</button>
+      <input type="range" min="0" max="360" value="0" id="sweepSlider" style="width:200px;accent-color:#f7971e;">
+      <span style="color:#bbb;">角度: <b id="sweepDeg" style="color:#ffd200;">0°</b></span>
+    </div>
     <div class="info-box">
-      <strong>💡 面动成体：</strong>拖动滑块 <span class="highlight">α</span> 控制旋转角度，观察长方形/三角形旋转一周如何形成圆柱/圆锥。
+      <strong>💡 面动成体：</strong>一面绕轴旋转一周形成体。<span class="highlight">长方形</span>绕一边旋转→<span class="highlight">圆柱</span>；<span class="highlight">直角三角形</span>绕直角边旋转→<span class="highlight">圆锥</span>。
     </div>
   </div>
 
+  <!-- 3D 探究 -->
   <div class="panel" id="panel-explore">
-    <div class="mode-switch">
+    <div class="mode-switch" id="swExplore">
       <button class="mode-btn active" data-shape="cylinder">🔵 圆柱</button>
       <button class="mode-btn" data-shape="cone">🔺 圆锥</button>
     </div>
-    <div class="ggb-container"><div id="ggb-explore" style="width:100%;height:100%;"><div class="loading"><span class="spin"></span>加载中...</div></div></div>
+    <div class="canvas-wrap"><canvas id="cvExplore" width="900" height="500"></canvas></div>
+    <div class="controls">
+      <div class="control-card" style="border-left:3px solid #f7971e;">
+        <h3>底面半径 r</h3>
+        <div class="control-row">
+          <input type="range" min="1" max="8" value="3" step="0.1" id="rSlider">
+          <input type="number" min="0.5" max="8" value="3" step="0.1" id="rInput">
+          <span class="unit">cm</span>
+        </div>
+      </div>
+      <div class="control-card" style="border-left:3px solid #4fc3f7;">
+        <h3>高 h</h3>
+        <div class="control-row">
+          <input type="range" min="1" max="12" value="5" step="0.1" id="hSlider">
+          <input type="number" min="0.5" max="12" value="5" step="0.1" id="hInput">
+          <span class="unit">cm</span>
+        </div>
+      </div>
+    </div>
     <div class="data-row">
       <div class="data-item"><div class="label">底面积</div><div class="value" id="valArea">28.27</div><div class="unit">cm²</div></div>
       <div class="data-item"><div class="label">侧面积</div><div class="value" id="valLateral">94.25</div><div class="unit">cm²</div></div>
@@ -53,371 +72,539 @@
     </div>
   </div>
 
+  <!-- 展开图 -->
   <div class="panel" id="panel-unfold">
-    <div class="mode-switch">
+    <div class="mode-switch" id="swUnfold">
       <button class="mode-btn active" data-unfold="cylinder">🔵 圆柱展开</button>
       <button class="mode-btn" data-unfold="cone">🔺 圆锥展开</button>
     </div>
-    <div class="ggb-container"><div id="ggb-unfold" style="width:100%;height:100%;"><div class="loading"><span class="spin"></span>加载中...</div></div></div>
-    <div style="text-align:center;color:#bbb;font-size:14px;margin:8px 0;">👆 拖动 <b style="color:#f7971e;">t</b> 滑块控制展开程度，拖动 <b style="color:#f7971e;">r、h</b> 改变尺寸</div>
+    <div class="canvas-wrap"><canvas id="cvUnfold" width="900" height="500"></canvas></div>
+    <div class="sweep-controls">
+      <button class="btn btn-primary" id="btnUnfoldPlay">📐 展开</button>
+      <input type="range" min="0" max="100" value="0" id="unfoldSlider" style="width:200px;accent-color:#f7971e;">
+      <span style="color:#bbb;">展开: <b id="unfoldPct" style="color:#ffd200;">0%</b></span>
+    </div>
+    <div class="controls">
+      <div class="control-card" style="border-left:3px solid #f7971e;">
+        <h3>底面半径 r</h3>
+        <div class="control-row">
+          <input type="range" min="1" max="6" value="3" step="0.1" id="urSlider">
+          <input type="number" min="0.5" max="6" value="3" step="0.1" id="urInput">
+          <span class="unit">cm</span>
+        </div>
+      </div>
+      <div class="control-card" style="border-left:3px solid #4fc3f7;">
+        <h3>高 h</h3>
+        <div class="control-row">
+          <input type="range" min="1" max="10" value="5" step="0.1" id="uhSlider">
+          <input type="number" min="0.5" max="10" value="5" step="0.1" id="uhInput">
+          <span class="unit">cm</span>
+        </div>
+      </div>
+    </div>
   </div>
 
+  <!-- 体积关系 -->
   <div class="panel" id="panel-volume">
-    <div class="ggb-container"><div id="ggb-volume" style="width:100%;height:100%;"><div class="loading"><span class="spin"></span>加载中...</div></div></div>
+    <div class="canvas-wrap"><canvas id="cvVolume" width="900" height="500"></canvas></div>
+    <div class="controls">
+      <div class="control-card" style="border-left:3px solid #f7971e;">
+        <h3>底面半径 r</h3>
+        <div class="control-row">
+          <input type="range" min="1" max="6" value="3" step="0.1" id="vrSlider">
+          <input type="number" min="0.5" max="6" value="3" step="0.1" id="vrInput">
+          <span class="unit">cm</span>
+        </div>
+      </div>
+      <div class="control-card" style="border-left:3px solid #4fc3f7;">
+        <h3>高 h</h3>
+        <div class="control-row">
+          <input type="range" min="1" max="10" value="5" step="0.1" id="vhSlider">
+          <input type="number" min="0.5" max="10" value="5" step="0.1" id="vhInput">
+          <span class="unit">cm</span>
+        </div>
+      </div>
+    </div>
     <div class="data-row">
       <div class="data-item"><div class="label">圆柱体积</div><div class="value" id="valCylVol">141.37</div><div class="unit">cm³</div></div>
       <div class="data-item"><div class="label">圆锥体积</div><div class="value" id="valConeVol">47.12</div><div class="unit">cm³</div></div>
-      <div class="data-item"><div class="label">V柱 : V锥</div><div class="value" id="valRatio">3 : 1</div></div>
+      <div class="data-item"><div class="label">V柱:V锥</div><div class="value" id="valRatio">3:1</div></div>
     </div>
-    <div class="info-box">
-      <strong>💡 核心规律：</strong>等底等高时，<span class="highlight">圆柱体积 = 圆锥体积的 3 倍</span>。拖动 r 和 h 滑块验证。
-    </div>
+    <div class="info-box"><strong>💡 核心规律：</strong>等底等高，<span class="highlight">V柱 = 3×V锥</span>，V锥 = ⅓πr²h</div>
   </div>
 
+  <!-- 数据记录 -->
   <div class="panel" id="panel-record">
     <div style="text-align:center;margin:15px 0;">
       <button class="btn btn-primary" id="addRecordBtn">📝 记录当前参数</button>
       <button class="btn btn-outline" id="clearRecordBtn">🗑️ 清空</button>
     </div>
-    <table class="record-table"><thead><tr><th>#</th><th>r</th><th>h</th><th>S底</th><th>V柱</th><th>V锥</th><th>V柱:V锥</th><th>r²</th><th>V柱/r²</th></tr></thead><tbody id="recordTbody"><tr><td colspan="9" style="color:#666;padding:30px;">在"体积关系"中调整半径和高后，点击记录</td></tr></tbody></table>
+    <table class="record-table"><thead><tr><th>#</th><th>r</th><th>h</th><th>S底</th><th>V柱</th><th>V锥</th><th>V柱:V锥</th><th>r²</th><th>V柱/r²</th></tr></thead><tbody id="recordTbody"><tr><td colspan="9" style="color:#666;padding:30px;">切换到"体积关系"调整参数后点击记录</td></tr></tbody></table>
     <div style="margin:15px 0;padding:16px;background:rgba(76,175,80,0.08);border-radius:12px;border:1px solid rgba(76,175,80,0.2);">
-      <strong style="color:#81c784;">📖 知识点：</strong>
+      <strong style="color:#81c784;">📖 知识点</strong>
       <div style="margin-top:10px;line-height:1.9;font-size:14px;display:none;" id="knowledgeReveal2">
-        🔹 V柱 = πr²h &nbsp; 🔹 V锥 = ⅓πr²h &nbsp; 🔹 V柱 = 3 × V锥<br>
-        🔹 r×2 → V×4（V∝r²）&nbsp; 🔹 h×2 → V×2（V∝h）
+        V柱=πr²h · V锥=⅓πr²h · V柱=3×V锥 · r×2→V×4 · h×2→V×2
       </div>
       <button class="btn btn-sm btn-outline" id="revealBtn2">🔓 查看规律</button>
     </div>
   </div>
 
+  <!-- 闯关 -->
   <div class="panel" id="panel-game">
-    <div class="game-score">🏆 得分：<span id="gameScore" style="color:#ffd200;font-size:28px;">0</span> / <span id="gameTotal">0</span></div>
+    <div class="game-score">🏆 <span id="gameScore" style="color:#ffd200;font-size:28px;">0</span> / <span id="gameTotal">0</span></div>
     <div class="game-question">
-      <div class="q-text" id="gameQuestion">点击"开始挑战"</div>
+      <div class="q-text" id="gameQuestion">点击开始挑战</div>
       <div class="game-options" id="gameOptions"></div>
       <div class="game-feedback" id="gameFeedback"></div>
     </div>
     <div style="text-align:center;margin:15px 0;">
       <button class="btn btn-primary" id="startGameBtn2">🎯 开始挑战</button>
-      <button class="btn btn-outline" id="nextGameBtn2" style="display:none;">▶️ 下一题</button>
+      <button class="btn btn-outline" id="nextGameBtn2" style="display:none;">▶ 下一题</button>
     </div>
   </div>
 </div>
 
 <script>
+// ===== Utility =====
+function $(id){return document.getElementById(id);}
+function on(id,ev,fn){document.getElementById(id).addEventListener(ev,fn);}
+const PI=Math.PI;
+
 // ===== Tab =====
-let currentTab = 'rotate';
-const applets = {}, appletsLoaded = {};
-document.getElementById('tabBar').addEventListener('click', e => {
-  if (!e.target.classList.contains('tab-btn')) return;
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+let currentTab='rotate';
+document.getElementById('tabBar').addEventListener('click',e=>{
+  if(!e.target.classList.contains('tab-btn'))return;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   e.target.classList.add('active');
-  currentTab = e.target.dataset.tab;
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('panel-' + currentTab).classList.add('active');
-  if (!appletsLoaded[currentTab]) initApplet(currentTab);
-  else if (applets[currentTab]) resizeApplet(currentTab);
+  currentTab=e.target.dataset.tab;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+currentTab).classList.add('active');
+  if(currentTab==='rotate')drawSweep();
+  if(currentTab==='explore')drawExplore();
+  if(currentTab==='unfold')drawUnfold();
+  if(currentTab==='volume')drawVolume();
 });
 
-function resizeApplet(key) {
-  const el = document.getElementById('ggb-' + key);
-  if (!el || !applets[key]) return;
-  const w = el.parentElement.clientWidth;
-  applets[key].setSize(w, 500);
-}
-
-// ===== Create GGB Applet =====
-function createApplet(id, appName, onLoad) {
-  const params = {
-    id: id,
-    appName: appName,
-    width: 900, height: 500,
-    showToolBar: false, showAlgebraInput: false, showMenuBar: false,
-    enableShiftDragZoom: true,
-    borderColor: '#302b63',
-    appletOnLoad: function(api) { onLoad(api); }
-  };
-  const applet = new GGBApplet(params, true);
-  applet.inject('ggb-' + id);
+// ===== Canvas 3D Projection =====
+function project3D(x,y,z,cx,cy,scale,ax,ay){
+  // Simple isometric-like projection with rotation angles ax,ay (radians)
+  const cosX=Math.cos(ax),sinX=Math.sin(ax);
+  const cosY=Math.cos(ay),sinY=Math.sin(ay);
+  // Rotate around X then Y
+  let y1=y*cosX-z*sinX, z1=y*sinX+z*cosX;
+  let x2=x*cosY+z1*sinY, z2=-x*sinY+z1*cosY;
+  return {sx:cx+x2*scale, sy:cy-y1*scale};
 }
 
 // ===== 面动成体 =====
-let sweepApi = null, sweepMode = 'cylinder';
-function initSweep() {
-  createApplet('rotate', '3d', function(api) {
-    sweepApi = api;
-    buildSweepScene();
-  });
-}
+const cvSweep=$('cvSweep'), ctxS=cvSweep.getContext('2d');
+let sweepMode='cylinder', sweepDeg=0, sweepPlaying=false;
 
-function buildSweepScene() {
-  const api = sweepApi;
-  api.evalCommand('O=(0,0,0)');
-  api.evalCommand('AxisLine=Segment((0,0,-1),(0,0,7))');
-  api.evalCommand('SetColor(AxisLine,"red")');
-  api.evalCommand('SetLineStyle(AxisLine,2)');
-  api.evalCommand('α=Slider(0°,360°,1°)');
-  api.evalCommand('SetCaption(α,"旋转角度 α")');
+function drawSweep(){
+  const W=cvSweep.width,H=cvSweep.height;
+  ctxS.clearRect(0,0,W,H);
+  ctxS.fillStyle='#1a1a2e';ctxS.fillRect(0,0,W,H);
 
-  if (sweepMode === 'cylinder') {
-    api.evalCommand('r=3');
-    api.evalCommand('h=5');
-    // Original rectangle
-    api.evalCommand('A1=(r,0,0)');
-    api.evalCommand('B1=(r,0,h)');
-    api.evalCommand('rect1=Polygon((0,0,0),A1,B1,(0,0,h))');
-    api.evalCommand('SetColor(rect1,"orange")');
-    api.evalCommand('SetFilling(rect1,0.5)');
-    // Rotated rectangle
-    api.evalCommand('A2=(r cos(α), r sin(α), 0)');
-    api.evalCommand('B2=(r cos(α), r sin(α), h)');
-    api.evalCommand('rect2=Polygon((0,0,0),A2,B2,(0,0,h))');
-    api.evalCommand('SetColor(rect2,"blue")');
-    api.evalCommand('SetFilling(rect2,0.35)');
-    // Result cylinder
-    api.evalCommand('cyl=Surface(r cos(u), r sin(u), v, u, 0, α, v, 0, h)');
-    api.evalCommand('SetColor(cyl,"cyan")');
-    api.evalCommand('SetFilling(cyl,0.3)');
-    // Base circles
-    api.evalCommand('cBot=Circle((0,0,0),(0,0,1),r)');
-    api.evalCommand('cTop=Circle((0,0,h),(0,0,1),r)');
-  } else {
-    api.evalCommand('r=3');
-    api.evalCommand('h=5');
-    // Original triangle
-    api.evalCommand('A1=(r,0,-h/2)');
-    api.evalCommand('tri1=Polygon((0,0,-h/2),A1,(0,0,h/2))');
-    api.evalCommand('SetColor(tri1,"orange")');
-    api.evalCommand('SetFilling(tri1,0.5)');
-    // Rotated triangle
-    api.evalCommand('A2=(r cos(α), r sin(α), -h/2)');
-    api.evalCommand('tri2=Polygon((0,0,-h/2),A2,(0,0,h/2))');
-    api.evalCommand('SetColor(tri2,"blue")');
-    api.evalCommand('SetFilling(tri2,0.35)');
-    // Result cone surface
-    api.evalCommand('coneSurf=Surface((1-v/(h/2+h/2)) r cos(u), (1-v/(h/2+h/2)) r sin(u), v, u, 0, α, v, -h/2, h/2)');
-    api.evalCommand('SetColor(coneSurf,"cyan")');
-    api.evalCommand('SetFilling(coneSurf,0.3)');
-    // Base
-    api.evalCommand('cBot=Circle((0,0,-h/2),(0,0,1),r)');
+  const cx=W/2-80,cy=H/2+40,scale=55;
+  const ax=-0.55,ay=0.65;
+  const r=2.5,h=4.5;
+  const ang=sweepDeg*PI/180;
+
+  // Axis
+  ctxS.strokeStyle='rgba(255,80,80,0.8)';ctxS.lineWidth=2;ctxS.setLineDash([6,4]);
+  let top=project3D(0,h+0.8,0,cx,cy,scale,ax,ay);
+  let bot=project3D(0,-1,0,cx,cy,scale,ax,ay);
+  ctxS.beginPath();ctxS.moveTo(top.sx,top.sy);ctxS.lineTo(bot.sx,bot.sy);ctxS.stroke();
+  ctxS.setLineDash([]);
+  ctxS.fillStyle='#ff6666';ctxS.font='13px sans-serif';
+  ctxS.fillText('旋转轴',top.sx+6,top.sy);
+
+  // Result surface (partial cylinder/cone)
+  const segs=36, segsDone=Math.floor(segs*ang/(2*PI));
+  if(sweepMode==='cylinder'){
+    for(let i=0;i<Math.min(segsDone,segs);i++){
+      const a=i*2*PI/segs;
+      const a2=(i+1)*2*PI/segs;
+      let p1b=project3D(r*Math.cos(a),0,r*Math.sin(a),cx,cy,scale,ax,ay);
+      let p1t=project3D(r*Math.cos(a),h,r*Math.sin(a),cx,cy,scale,ax,ay);
+      let p2b=project3D(r*Math.cos(a2),0,r*Math.sin(a2),cx,cy,scale,ax,ay);
+      let p2t=project3D(r*Math.cos(a2),h,r*Math.sin(a2),cx,cy,scale,ax,ay);
+      ctxS.beginPath();ctxS.moveTo(p1b.sx,p1b.sy);ctxS.lineTo(p1t.sx,p1t.sy);
+      ctxS.lineTo(p2t.sx,p2t.sy);ctxS.lineTo(p2b.sx,p2b.sy);ctxS.closePath();
+      ctxS.fillStyle='rgba(79,195,247,0.25)';ctxS.fill();
+      ctxS.strokeStyle='rgba(79,195,247,0.4)';ctxS.lineWidth=0.5;ctxS.stroke();
+    }
+    // Base ellipse
+    ctxS.strokeStyle='rgba(79,195,247,0.6)';ctxS.lineWidth=1.5;
+    drawEllipse(ctxS,cx,cy-projY(0,0,0),cx,cy,r,scale,ax,ay,false);
+  }else{
+    for(let i=0;i<Math.min(segsDone,segs);i++){
+      const a=i*2*PI/segs,a2=(i+1)*2*PI/segs;
+      let p1b=project3D(r*Math.cos(a),0,r*Math.sin(a),cx,cy,scale,ax,ay);
+      let p2b=project3D(r*Math.cos(a2),0,r*Math.sin(a2),cx,cy,scale,ax,ay);
+      let apex=project3D(0,h,0,cx,cy,scale,ax,ay);
+      ctxS.beginPath();ctxS.moveTo(p1b.sx,p1b.sy);ctxS.lineTo(p2b.sx,p2b.sy);ctxS.lineTo(apex.sx,apex.sy);ctxS.closePath();
+      ctxS.fillStyle='rgba(79,195,247,0.25)';ctxS.fill();
+      ctxS.strokeStyle='rgba(79,195,247,0.4)';ctxS.lineWidth=0.5;ctxS.stroke();
+    }
   }
-  // Show rotation axis label
-  api.evalCommand('SetVisibleInView(AxisLine,1,false)');
+
+  // Rotating shape
+  const ca=Math.cos(ang),sa=Math.sin(ang);
+  if(sweepMode==='cylinder'){
+    // Rectangle
+    let o=project3D(0,0,0,cx,cy,scale,ax,ay);
+    let a1=project3D(r*ca,0,r*sa,cx,cy,scale,ax,ay);
+    let b1=project3D(r*ca,h,r*sa,cx,cy,scale,ax,ay);
+    let ot=project3D(0,h,0,cx,cy,scale,ax,ay);
+    ctxS.beginPath();ctxS.moveTo(o.sx,o.sy);ctxS.lineTo(a1.sx,a1.sy);ctxS.lineTo(b1.sx,b1.sy);ctxS.lineTo(ot.sx,ot.sy);ctxS.closePath();
+    ctxS.fillStyle='rgba(255,140,0,0.55)';ctxS.fill();
+    ctxS.strokeStyle='#ff8c00';ctxS.lineWidth=2;ctxS.stroke();
+  }else{
+    let o=project3D(0,0,0,cx,cy,scale,ax,ay);
+    let a1=project3D(r*ca,0,r*sa,cx,cy,scale,ax,ay);
+    let apex=project3D(0,h,0,cx,cy,scale,ax,ay);
+    ctxS.beginPath();ctxS.moveTo(o.sx,o.sy);ctxS.lineTo(a1.sx,a1.sy);ctxS.lineTo(apex.sx,apex.sy);ctxS.closePath();
+    ctxS.fillStyle='rgba(255,140,0,0.55)';ctxS.fill();
+    ctxS.strokeStyle='#ff8c00';ctxS.lineWidth=2;ctxS.stroke();
+  }
+
+  // Fixed base circle
+  ctxS.strokeStyle='rgba(255,140,0,0.35)';ctxS.lineWidth=1;ctxS.setLineDash([3,3]);
+  drawEllipse(ctxS,cx,cy-projY(0,0,0),cx,cy,r,scale,ax,ay,true);
+  ctxS.setLineDash([]);
 }
 
-document.querySelector('#panel-rotate .mode-switch').addEventListener('click', e => {
-  if (!e.target.classList.contains('mode-btn')) return;
-  document.querySelectorAll('#panel-rotate .mode-btn').forEach(b => b.classList.remove('active'));
+function projY(x,y,z){let ax=-0.55,ay=0.65,s=55;let y1=y*Math.cos(ax)-z*Math.sin(ax);return y1*s;}
+
+function drawEllipse(ctx,cx,cy,ox,oy,r,scale,ax,ay,full){
+  ctx.beginPath();
+  const pts=full?65:Math.floor(65*sweepDeg/360)+1;
+  for(let i=0;i<=pts;i++){
+    let a=(i/64)*2*PI;
+    let p=project3D(r*Math.cos(a),0,r*Math.sin(a),cx,cy,scale,ax,ay);
+    if(i===0)ctx.moveTo(p.sx,p.sy);else ctx.lineTo(p.sx,p.sy);
+  }
+  ctx.stroke();
+}
+
+$('btnSweepPlay').addEventListener('click',()=>{
+  sweepPlaying=!sweepPlaying;$('btnSweepPlay').textContent=sweepPlaying?'⏸ 暂停':'▶ 播放';
+  if(sweepPlaying)sweepAnim();
+});
+$('btnSweepReset').addEventListener('click',()=>{sweepPlaying=false;sweepDeg=0;$('sweepSlider').value=0;$('sweepDeg').textContent='0°';$('btnSweepPlay').textContent='▶ 播放';drawSweep();});
+$('sweepSlider').addEventListener('input',()=>{sweepDeg=+$('sweepSlider').value;$('sweepDeg').textContent=sweepDeg+'°';drawSweep();});
+
+function sweepAnim(){
+  if(!sweepPlaying)return;
+  sweepDeg+=2;if(sweepDeg>360){sweepDeg=360;sweepPlaying=false;$('btnSweepPlay').textContent='▶ 播放';}
+  $('sweepSlider').value=sweepDeg;$('sweepDeg').textContent=Math.floor(sweepDeg)+'°';
+  drawSweep();
+  requestAnimationFrame(()=>{if(sweepPlaying)sweepAnim();});
+}
+
+document.getElementById('swRotate').addEventListener('click',e=>{
+  if(!e.target.classList.contains('mode-btn'))return;
+  document.querySelectorAll('#swRotate .mode-btn').forEach(b=>b.classList.remove('active'));
   e.target.classList.add('active');
-  sweepMode = e.target.dataset.mode;
-  if (sweepApi) {
-    sweepApi.reset();
-    buildSweepScene();
-  }
+  sweepMode=e.target.dataset.mode;
+  sweepDeg=0;sweepPlaying=false;$('sweepSlider').value=0;$('sweepDeg').textContent='0°';$('btnSweepPlay').textContent='▶ 播放';
+  drawSweep();
 });
 
+drawSweep();
+
 // ===== 3D 探究 =====
-let exploreShape = 'cylinder', exploreApi = null;
+const cvExplore=$('cvExplore'),ctxE=cvExplore.getContext('2d');
+let exploreShape='cylinder',eR=3,eH=5,eDrag=false,eAngleX=-0.55,eAngleY=0.65,eLastX=0,eLastY=0;
 
-function initExplore() {
-  createApplet('explore', '3d', function(api) {
-    exploreApi = api;
-    buildExploreScene();
-    // Listen for slider changes
-    api.registerObjectUpdateListener('r', updateExploreData);
-    api.registerObjectUpdateListener('h', updateExploreData);
-  });
-}
+function drawExplore(){
+  const W=cvExplore.width,H=cvExplore.height;
+  ctxE.clearRect(0,0,W,H);
+  ctxE.fillStyle='#1a1a2e';ctxE.fillRect(0,0,W,H);
+  const cx=W/2,cy=H/2,scale=55;
+  const ax=eAngleX,ay=eAngleY,r=eR,h=eH;
 
-function buildExploreScene() {
-  const api = exploreApi;
-  api.reset();
-  api.evalCommand('r=Slider(1,8,0.1)'); api.evalCommand('SetValue(r,3)');
-  api.evalCommand('h=Slider(1,12,0.1)'); api.evalCommand('SetValue(h,5)');
-  api.evalCommand('SetCaption(r,"半径 r")');
-  api.evalCommand('SetCaption(h,"高 h")');
-  if (exploreShape === 'cylinder') {
-    api.evalCommand('Cylinder((0,0,0),(0,0,h),r)');
-  } else {
-    api.evalCommand('Cone((0,0,-h/2),(0,0,h/2),r)');
+  // Axis
+  ctxE.strokeStyle='rgba(255,255,255,0.1)';ctxE.lineWidth=1;ctxE.setLineDash([2,6]);
+  let t=project3D(0,h+1.5,0,cx,cy,scale,ax,ay);
+  let b=project3D(0,-1.5,0,cx,cy,scale,ax,ay);
+  ctxE.beginPath();ctxE.moveTo(t.sx,t.sy);ctxE.lineTo(b.sx,b.sy);ctxE.stroke();
+  ctxE.setLineDash([]);
+
+  // Draw solid
+  const segs=48;
+  const colBody='rgba(255,140,0,0.6)',colLine='rgba(255,160,40,0.9)';
+  const colBody2='rgba(79,195,247,0.6)',colLine2='rgba(100,210,255,0.9)';
+
+  if(exploreShape==='cylinder'){
+    drawCylinder3D(ctxE,cx,cy,scale,ax,ay,r,h,0,0,colBody,colLine);
+  }else{
+    drawCone3D(ctxE,cx,cy,scale,ax,ay,r,h,0,0,colBody2,colLine2);
   }
+
   updateExploreData();
 }
 
-function updateExploreData() {
-  if (!exploreApi) return;
-  const r = exploreApi.getValue('r'), h = exploreApi.getValue('h'), pi = Math.PI;
-  document.getElementById('valArea').textContent = (pi * r * r).toFixed(2);
-  if (exploreShape === 'cylinder') {
-    document.getElementById('valLateral').textContent = (2 * pi * r * h).toFixed(2);
-    document.getElementById('valVolume').textContent = (pi * r * r * h).toFixed(2);
-  } else {
-    const s = Math.sqrt(r * r + h * h);
-    document.getElementById('valLateral').textContent = (pi * r * s).toFixed(2);
-    document.getElementById('valVolume').textContent = (pi * r * r * h / 3).toFixed(2);
+function drawCylinder3D(ctx,cx,cy,s,ax,ay,r,h,offX,offZ,fc,sc){
+  const segs=48;
+  // Body
+  for(let i=0;i<segs;i++){
+    const a1=i*2*PI/segs,a2=(i+1)*2*PI/segs;
+    let p1b=project3D(offX+r*Math.cos(a1),0,offZ+r*Math.sin(a1),cx,cy,s,ax,ay);
+    let p1t=project3D(offX+r*Math.cos(a1),h,offZ+r*Math.sin(a1),cx,cy,s,ax,ay);
+    let p2b=project3D(offX+r*Math.cos(a2),0,offZ+r*Math.sin(a2),cx,cy,s,ax,ay);
+    let p2t=project3D(offX+r*Math.cos(a2),h,offZ+r*Math.sin(a2),cx,cy,s,ax,ay);
+    ctx.beginPath();ctx.moveTo(p1b.sx,p1b.sy);ctx.lineTo(p1t.sx,p1t.sy);ctx.lineTo(p2t.sx,p2t.sy);ctx.lineTo(p2b.sx,p2b.sy);ctx.closePath();
+    ctx.fillStyle=fc;ctx.fill();ctx.strokeStyle=sc;ctx.lineWidth=0.5;ctx.stroke();
+  }
+  // Top ellipse
+  let topp=[];for(let i=0;i<=segs;i++){let a=i*2*PI/segs;topp.push(project3D(offX+r*Math.cos(a),h,offZ+r*Math.sin(a),cx,cy,s,ax,ay));}
+  ctx.beginPath();ctx.moveTo(topp[0].sx,topp[0].sy);for(let i=1;i<topp.length;i++)ctx.lineTo(topp[i].sx,topp[i].sy);
+  ctx.fillStyle='rgba(255,160,60,0.3)';ctx.fill();ctx.strokeStyle='rgba(255,180,80,0.7)';ctx.lineWidth=1.5;ctx.stroke();
+  // Bottom ellipse
+  let botp=[];for(let i=0;i<=segs;i++){let a=i*2*PI/segs;botp.push(project3D(offX+r*Math.cos(a),0,offZ+r*Math.sin(a),cx,cy,s,ax,ay));}
+  ctx.beginPath();ctx.moveTo(botp[0].sx,botp[0].sy);for(let i=1;i<botp.length;i++)ctx.lineTo(botp[i].sx,botp[i].sy);
+  ctx.fillStyle='rgba(255,140,60,0.25)';ctx.fill();ctx.strokeStyle='rgba(255,180,80,0.7)';ctx.lineWidth=1.5;ctx.stroke();
+}
+
+function drawCone3D(ctx,cx,cy,s,ax,ay,r,h,offX,offZ,fc,sc){
+  const segs=48;
+  const apex=project3D(offX,h/2,offZ,cx,cy,s,ax,ay);
+  for(let i=0;i<segs;i++){
+    const a1=i*2*PI/segs,a2=(i+1)*2*PI/segs;
+    let p1=project3D(offX+r*Math.cos(a1),-h/2,offZ+r*Math.sin(a1),cx,cy,s,ax,ay);
+    let p2=project3D(offX+r*Math.cos(a2),-h/2,offZ+r*Math.sin(a2),cx,cy,s,ax,ay);
+    ctx.beginPath();ctx.moveTo(p1.sx,p1.sy);ctx.lineTo(p2.sx,p2.sy);ctx.lineTo(apex.sx,apex.sy);ctx.closePath();
+    ctx.fillStyle=fc;ctx.fill();ctx.strokeStyle=sc;ctx.lineWidth=0.5;ctx.stroke();
+  }
+  // Base
+  let botp=[];for(let i=0;i<=segs;i++){let a=i*2*PI/segs;botp.push(project3D(offX+r*Math.cos(a),-h/2,offZ+r*Math.sin(a),cx,cy,s,ax,ay));}
+  ctx.beginPath();ctx.moveTo(botp[0].sx,botp[0].sy);for(let i=1;i<botp.length;i++)ctx.lineTo(botp[i].sx,botp[i].sy);
+  ctx.fillStyle='rgba(100,210,255,0.3)';ctx.fill();ctx.strokeStyle='rgba(120,220,255,0.7)';ctx.lineWidth=1.5;ctx.stroke();
+}
+
+function updateExploreData(){
+  const r=eR,h=eH;
+  $('valArea').textContent=(PI*r*r).toFixed(2);
+  if(exploreShape==='cylinder'){
+    $('valLateral').textContent=(2*PI*r*h).toFixed(2);
+    $('valVolume').textContent=(PI*r*r*h).toFixed(2);
+  }else{
+    const s=Math.sqrt(r*r+h*h);
+    $('valLateral').textContent=(PI*r*s).toFixed(2);
+    $('valVolume').textContent=(PI*r*r*h/3).toFixed(2);
   }
 }
 
-document.querySelector('#panel-explore .mode-switch').addEventListener('click', e => {
-  if (!e.target.classList.contains('mode-btn')) return;
-  document.querySelectorAll('#panel-explore .mode-btn').forEach(b => b.classList.remove('active'));
+function syncSliders(sl,ip,cb){
+  document.getElementById(sl).addEventListener('input',()=>{document.getElementById(ip).value=document.getElementById(sl).value;cb();});
+  document.getElementById(ip).addEventListener('input',()=>{let v=+document.getElementById(ip).value;if(!isNaN(v)){document.getElementById(sl).value=v;cb();}});
+}
+syncSliders('rSlider','rInput',()=>{eR=+$('rInput').value||3;drawExplore();});
+syncSliders('hSlider','hInput',()=>{eH=+$('hInput').value||5;drawExplore();});
+
+$('cvExplore').addEventListener('mousedown',e=>{eDrag=true;eLastX=e.clientX;eLastY=e.clientY;});
+$('cvExplore').addEventListener('mousemove',e=>{if(!eDrag)return;eAngleY+=(e.clientX-eLastX)*0.005;eAngleX+=(e.clientY-eLastY)*0.005;eLastX=e.clientX;eLastY=e.clientY;drawExplore();});
+$('cvExplore').addEventListener('mouseup',()=>{eDrag=false;});
+$('cvExplore').addEventListener('mouseleave',()=>{eDrag=false;});
+// Touch
+$('cvExplore').addEventListener('touchstart',e=>{eDrag=true;eLastX=e.touches[0].clientX;eLastY=e.touches[0].clientY;e.preventDefault();});
+$('cvExplore').addEventListener('touchmove',e=>{if(!eDrag)return;eAngleY+=(e.touches[0].clientX-eLastX)*0.005;eAngleX+=(e.touches[0].clientY-eLastY)*0.005;eLastX=e.touches[0].clientX;eLastY=e.touches[0].clientY;drawExplore();});
+$('cvExplore').addEventListener('touchend',()=>{eDrag=false;});
+
+document.getElementById('swExplore').addEventListener('click',e=>{
+  if(!e.target.classList.contains('mode-btn'))return;
+  document.querySelectorAll('#swExplore .mode-btn').forEach(b=>b.classList.remove('active'));
   e.target.classList.add('active');
-  exploreShape = e.target.dataset.shape;
-  if (exploreApi) buildExploreScene();
+  exploreShape=e.target.dataset.shape;drawExplore();
 });
+drawExplore();
 
 // ===== 展开图 =====
-let unfoldShape = 'cylinder', unfoldApi = null;
+const cvUnfold=$('cvUnfold'),ctxU=cvUnfold.getContext('2d');
+let unfoldShape='cylinder',uR=3,uH=5,uT=0;
 
-function initUnfold() {
-  createApplet('unfold', '3d', function(api) {
-    unfoldApi = api;
-    buildUnfoldScene();
-  });
-}
+function drawUnfold(){
+  const W=cvUnfold.width,H=cvUnfold.height;
+  ctxU.clearRect(0,0,W,H);
+  ctxU.fillStyle='#1a1a2e';ctxU.fillRect(0,0,W,H);
 
-function buildUnfoldScene() {
-  const api = unfoldApi;
-  api.reset();
-  api.evalCommand('r=Slider(1,6,0.1)'); api.evalCommand('SetValue(r,3)');
-  api.evalCommand('h=Slider(1,10,0.1)'); api.evalCommand('SetValue(h,5)');
-  api.evalCommand('t=Slider(0,1,0.01)'); api.evalCommand('SetValue(t,0)');
-  api.evalCommand('SetCaption(r,"半径 r")');
-  api.evalCommand('SetCaption(h,"高 h")');
-  api.evalCommand('SetCaption(t,"展开程度 t")');
+  const r=uR,h=uH,t=uT;
+  const marginX=50,marginY=H/2;
 
-  if (unfoldShape === 'cylinder') {
-    // Solid cylinder that fades as t increases
-    api.evalCommand('cyl=Cylinder((0,0,0),(0,0,h*(1-t)),r)');
-    // Upper base circle moves to the right as t increases
-    api.evalCommand('cUp=Circle((3+r*(1-t)+2*π*r*t, 0, h/2*t), (0,0,1), r)');
-    api.evalCommand('SetColor(cUp,"blue")');
-    // Lower base circle
-    api.evalCommand('cLo=Circle((3+r*(1-t)+2*π*r*t, 0, -h/2*t), (0,0,1), r)');
-    api.evalCommand('SetColor(cLo,"blue")');
-    // Lateral surface as rectangle (represented as a plane in 3D)
-    api.evalCommand('lateral=Translate(Polygon((3+r, -h/2, 0), (3+r, h/2, 0), (3+r, h/2, 2*π*r), (3+r, -h/2, 2*π*r)), Vector((0,0,0)))');
-    // Alternative: use a point and text for the lateral rectangle
-    api.evalCommand('rectLabel=Text("侧面展开后是长方形\\n长=底面周长=2πr="+(2π r)+"\\n宽=高=h="+h,(5+r,0,0))');
-  } else {
-    // Cone
-    api.evalCommand('cn=Cone((0,0,-h/2),(0,0,h/2*(1-t)),r*(1-t))');
-    // Base circle
-    api.evalCommand('cB=Circle((3+r,0,-h/2),(0,0,1),r)');
-    api.evalCommand('SetColor(cB,"blue")');
-    // Text info
-    api.evalCommand('slant=sqrt(r^2+h^2)');
-    api.evalCommand('arcAngle=2*π*r/slant');
-    api.evalCommand('infoLabel=Text("侧面展开后是扇形\\n半径=母线长="+slant+"\\n弧长=底面周长=2πr",(4+r,0,0))');
+  if(unfoldShape==='cylinder'){
+    // 3D cylinder on left (solid when t<1, fades)
+    const cx3d=200,cy3d=H/2,s3d=40;
+    if(t<0.98){ctxU.globalAlpha=1-t;drawCylinder3D(ctxU,cx3d,cy3d,s3d,-0.5,0.7,r,h,0,0,'rgba(255,140,0,0.5)','rgba(255,160,40,0.6)');ctxU.globalAlpha=1;}
+
+    // Flat: two circles + rectangle on the right
+    const cxFlat=450,cyFlat=H/2;
+    const rectW=2*PI*r*t;
+    const rectH=h;
+    // Bottom circle
+    ctxU.fillStyle='rgba(79,195,247,0.5)';ctxU.strokeStyle='rgba(79,195,247,0.8)';ctxU.lineWidth=2;
+    ctxU.beginPath();ctxU.arc(cxFlat,cyFlat+rectH/2+20,r*s3d/55*1.8,0,2*PI);ctxU.fill();ctxU.stroke();
+    ctxU.fillStyle='#fff';ctxU.font='12px sans-serif';ctxU.textAlign='center';
+    ctxU.fillText('底面圆',cxFlat,cyFlat+rectH/2+20+r*s3d/55*1.8+18);
+
+    // Rectangle
+    if(rectW>0){
+      ctxU.fillStyle='rgba(255,210,0,0.5)';ctxU.strokeStyle='#ffd200';ctxU.lineWidth=2;
+      ctxU.fillRect(cxFlat-rectW/2,cyFlat-rectH/2,rectW,rectH);
+      ctxU.strokeRect(cxFlat-rectW/2,cyFlat-rectH/2,rectW,rectH);
+      // Labels
+      ctxU.fillStyle='#fff';ctxU.font='13px sans-serif';
+      ctxU.fillText('长=底面周长=2πr='+(2*PI*r).toFixed(1)+'cm',cxFlat,cyFlat-rectH/2-10);
+      ctxU.fillText('宽=高='+h.toFixed(1)+'cm',cxFlat-rectW/2-10,cyFlat);
+    }
+    // Top circle
+    ctxU.fillStyle='rgba(79,195,247,0.5)';ctxU.strokeStyle='rgba(79,195,247,0.8)';ctxU.lineWidth=2;
+    ctxU.beginPath();ctxU.arc(cxFlat,cyFlat-rectH/2-20,r*s3d/55*1.8,0,2*PI);ctxU.fill();ctxU.stroke();
+    ctxU.fillText('底面圆',cxFlat,cyFlat-rectH/2-20-r*s3d/55*1.8-10);
+
+    // Arrow from 3D to flat
+    ctxU.strokeStyle='rgba(255,255,255,0.3)';ctxU.setLineDash([5,5]);ctxU.lineWidth=1;
+    ctxU.beginPath();ctxU.moveTo(260,cyFlat);ctxU.lineTo(cxFlat-rectW/2-r-10,cyFlat);ctxU.stroke();
+    ctxU.setLineDash([]);
+  }else{
+    // 3D cone on left
+    const cx3d=200,cy3d=H/2,s3d=45;
+    if(t<0.98){ctxU.globalAlpha=1-t;drawCone3D(ctxU,cx3d,cy3d,s3d,-0.5,0.7,r,h,0,0,'rgba(79,195,247,0.5)','rgba(100,210,255,0.6)');ctxU.globalAlpha=1;}
+
+    // Flat: circle + sector on the right
+    const cxFlat=500,cyFlat=H/2;
+    const slant=Math.sqrt(r*r+h*h);
+    const arcAngle=(2*PI*r/slant)*t;
+    // Sector
+    if(arcAngle>0.01){
+      ctxU.fillStyle='rgba(255,210,0,0.5)';ctxU.strokeStyle='#ffd200';ctxU.lineWidth=2;
+      ctxU.beginPath();
+      const sScale=s3d/55*2;
+      const secR=slant*sScale;
+      ctxU.moveTo(cxFlat,cyFlat);
+      ctxU.arc(cxFlat,cyFlat,secR,-PI/2,-PI/2+arcAngle);
+      ctxU.closePath();ctxU.fill();ctxU.stroke();
+      ctxU.fillStyle='#fff';ctxU.font='13px sans-serif';ctxU.textAlign='center';
+      ctxU.fillText('半径=母线长='+slant.toFixed(1)+'cm',cxFlat,cyFlat-secR-10);
+      ctxU.fillText('弧长=底面周长=2πr='+(2*PI*r).toFixed(1)+'cm',cxFlat+secR/2+10,cyFlat-20);
+    }
+    // Circle
+    ctxU.fillStyle='rgba(79,195,247,0.5)';ctxU.strokeStyle='rgba(79,195,247,0.8)';ctxU.lineWidth=2;
+    const cR=r*s3d/55*1.8;
+    ctxU.beginPath();ctxU.arc(cxFlat-80,cyFlat+60,cR,0,2*PI);ctxU.fill();ctxU.stroke();
+    ctxU.fillText('底面圆',cxFlat-80,cyFlat+60+cR+16);
   }
 }
 
-document.querySelector('#panel-unfold .mode-switch').addEventListener('click', e => {
-  if (!e.target.classList.contains('mode-btn')) return;
-  document.querySelectorAll('#panel-unfold .mode-btn').forEach(b => b.classList.remove('active'));
-  e.target.classList.add('active');
-  unfoldShape = e.target.dataset.unfold;
-  if (unfoldApi) buildUnfoldScene();
+$('btnUnfoldPlay').addEventListener('click',()=>{
+  const tgt=uT>0.5?0:1;
+  $('btnUnfoldPlay').textContent=tgt>0.5?'📦 还原':'📐 展开';
+  animateUnfold(tgt);
 });
+function animateUnfold(tgt){
+  const step=0.03;
+  function f(){if(Math.abs(uT-tgt)<step){uT=tgt;$('unfoldSlider').value=uT*100;$('unfoldPct').textContent=Math.round(uT*100)+'%';drawUnfold();return;}uT+=uT<tgt?step:-step;$('unfoldSlider').value=uT*100;$('unfoldPct').textContent=Math.round(uT*100)+'%';drawUnfold();requestAnimationFrame(f);}f();}
+$('unfoldSlider').addEventListener('input',()=>{uT=+$('unfoldSlider').value/100;$('unfoldPct').textContent=Math.round(uT*100)+'%';drawUnfold();});
+
+syncSliders('urSlider','urInput',()=>{uR=+$('urInput').value||3;drawUnfold();});
+syncSliders('uhSlider','uhInput',()=>{uH=+$('uhInput').value||5;drawUnfold();});
+
+document.getElementById('swUnfold').addEventListener('click',e=>{
+  if(!e.target.classList.contains('mode-btn'))return;
+  document.querySelectorAll('#swUnfold .mode-btn').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  unfoldShape=e.target.dataset.unfold;uT=0;$('unfoldSlider').value=0;$('unfoldPct').textContent='0%';$('btnUnfoldPlay').textContent='📐 展开';
+  drawUnfold();
+});
+drawUnfold();
 
 // ===== 体积关系 =====
-let volumeApi = null;
-function initVolume() {
-  createApplet('volume', '3d', function(api) {
-    volumeApi = api;
-    buildVolumeScene();
-    api.registerObjectUpdateListener('r', updateVolumeData);
-    api.registerObjectUpdateListener('h', updateVolumeData);
-  });
+const cvVolume=$('cvVolume'),ctxV=cvVolume.getContext('2d');
+let vR=3,vH=5,dragV=false,vAngX=-0.6,vAngY=0.65,vLX=0,vLY=0;
+
+function drawVolume(){
+  const W=cvVolume.width,H=cvVolume.height;
+  ctxV.clearRect(0,0,W,H);
+  ctxV.fillStyle='#1a1a2e';ctxV.fillRect(0,0,W,H);
+
+  const cx=W/2,cy=H/2+20,scale=45;
+  const ax=vAngX,ay=vAngY,r=vR,h=vH;
+
+  // Cylinder (left)
+  drawCylinder3D(ctxV,cx,cy,scale,ax,ay,r,h,-r-2,0,'rgba(255,140,0,0.7)','rgba(255,180,80,0.9)');
+  // Cone (right)
+  drawCone3D(ctxV,cx,cy,scale,ax,ay,r,h,r+2,0,'rgba(79,195,247,0.7)','rgba(120,220,255,0.9)');
+
+  // Labels
+  ctxV.fillStyle='#fff';ctxV.font='bold 15px sans-serif';ctxV.textAlign='center';
+  // These are 2D labels above the projections
+  let cylTop=project3D(-r-2,h+1.2,0,cx,cy,scale,ax,ay);
+  let coneTop=project3D(r+2,h+1.2,0,cx,cy,scale,ax,ay);
+  ctxV.fillStyle='#ffa000';ctxV.fillText('圆柱 V柱=πr²h',cylTop.sx,cylTop.sy);
+  ctxV.fillStyle='#4fc3f7';ctxV.fillText('圆锥 V锥=⅓πr²h',coneTop.sx,coneTop.sy);
+  ctxV.fillStyle='#ffd200';ctxV.fillText('V柱 : V锥 = 3 : 1',cx,cy-180);
+
+  const cylV=PI*r*r*h;
+  $('valCylVol').textContent=cylV.toFixed(2);
+  $('valConeVol').textContent=(cylV/3).toFixed(2);
+  $('valRatio').textContent='3 : 1';
 }
 
-function buildVolumeScene() {
-  const api = volumeApi;
-  api.reset();
-  api.evalCommand('r=Slider(1,6,0.1)'); api.evalCommand('SetValue(r,3)');
-  api.evalCommand('h=Slider(1,10,0.1)'); api.evalCommand('SetValue(h,5)');
-  api.evalCommand('SetCaption(r,"半径 r")');
-  api.evalCommand('SetCaption(h,"高 h")');
-  // Cylinder on left
-  api.evalCommand('cyl=Cylinder((-r-1.5, 0, 0), (-r-1.5, 0, h), r)');
-  api.evalCommand('SetColor(cyl,"orange")');
-  api.evalCommand('SetFilling(cyl,0.7)');
-  // Cone on right
-  api.evalCommand('cn=Cone((r+1.5, 0, 0), (r+1.5, 0, h), r)');
-  api.evalCommand('SetColor(cn,"blue")');
-  api.evalCommand('SetFilling(cn,0.7)');
-  // Text
-  api.evalCommand('tCyl=Text("V柱 = πr²h",(-r-1.5,0,h+1))');
-  api.evalCommand('tCone=Text("V锥 = ⅓πr²h",(r+1.5,0,h+1))');
-  api.evalCommand('tRatio=Text("V柱 : V锥 = 3 : 1",(0,0,h+2.5))');
-  api.evalCommand('SetColor(tRatio,"gold")');
-  updateVolumeData();
-}
+syncSliders('vrSlider','vrInput',()=>{vR=+$('vrInput').value||3;drawVolume();});
+syncSliders('vhSlider','vhInput',()=>{vH=+$('vhInput').value||5;drawVolume();});
 
-function updateVolumeData() {
-  if (!volumeApi) return;
-  const r = volumeApi.getValue('r'), h = volumeApi.getValue('h'), pi = Math.PI;
-  const cylV = pi * r * r * h;
-  document.getElementById('valCylVol').textContent = cylV.toFixed(2);
-  document.getElementById('valConeVol').textContent = (cylV / 3).toFixed(2);
-  document.getElementById('valRatio').textContent = '3 : 1';
-}
+$('cvVolume').addEventListener('mousedown',e=>{dragV=true;vLX=e.clientX;vLY=e.clientY;});
+$('cvVolume').addEventListener('mousemove',e=>{if(!dragV)return;vAngY+=(e.clientX-vLX)*0.005;vAngX+=(e.clientY-vLY)*0.005;vLX=e.clientX;vLY=e.clientY;drawVolume();});
+$('cvVolume').addEventListener('mouseup',()=>{dragV=false;});
+$('cvVolume').addEventListener('mouseleave',()=>{dragV=false;});
+$('cvVolume').addEventListener('touchstart',e=>{dragV=true;vLX=e.touches[0].clientX;vLY=e.touches[0].clientY;e.preventDefault();});
+$('cvVolume').addEventListener('touchmove',e=>{if(!dragV)return;vAngY+=(e.touches[0].clientX-vLX)*0.005;vAngX+=(e.touches[0].clientY-vLY)*0.005;vLX=e.touches[0].clientX;vLY=e.touches[0].clientY;drawVolume();});
+$('cvVolume').addEventListener('touchend',()=>{dragV=false;});
+drawVolume();
 
 // ===== Record =====
-let volRecs = [];
-let recR = 3, recH = 5;
-document.getElementById('addRecordBtn').addEventListener('click', () => {
-  if (volumeApi) { recR = volumeApi.getValue('r'); recH = volumeApi.getValue('h'); }
-  const pi = Math.PI, base = pi * recR * recR, cylV = base * recH;
-  volRecs.push({ r: recR, h: recH, base, cylV, coneV: cylV / 3 });
-  document.getElementById('recordTbody').innerHTML = volRecs.map((v, i) =>
-    `<tr><td>${i+1}</td><td>${v.r.toFixed(1)}</td><td>${v.h.toFixed(1)}</td><td>${v.base.toFixed(2)}</td><td style="color:#ffd200">${v.cylV.toFixed(2)}</td><td style="color:#4fc3f7">${v.coneV.toFixed(2)}</td><td>3:1</td><td>${(v.r*v.r).toFixed(2)}</td><td>${(v.cylV/(v.r*v.r)).toFixed(2)}</td></tr>`
-  ).join('');
+let volRecs=[];
+$('addRecordBtn').addEventListener('click',()=>{
+  const r=vR,h=vH,base=PI*r*r,cylV=base*h;
+  volRecs.push({r,h,base,cylV,coneV:cylV/3});
+  $('recordTbody').innerHTML=volRecs.map((v,i)=>`<tr><td>${i+1}</td><td>${v.r.toFixed(1)}</td><td>${v.h.toFixed(1)}</td><td>${v.base.toFixed(2)}</td><td style="color:#ffd200">${v.cylV.toFixed(2)}</td><td style="color:#4fc3f7">${v.coneV.toFixed(2)}</td><td>3:1</td><td>${(v.r*v.r).toFixed(2)}</td><td>${(v.cylV/(v.r*v.r)).toFixed(2)}</td></tr>`).join('');
 });
-document.getElementById('clearRecordBtn').addEventListener('click', () => { volRecs = []; document.getElementById('recordTbody').innerHTML = '<tr><td colspan="9" style="color:#666;padding:30px;">已清空</td></tr>'; });
-document.getElementById('revealBtn2').addEventListener('click', () => { document.getElementById('knowledgeReveal2').style.display = 'block'; document.getElementById('revealBtn2').style.display = 'none'; });
+$('clearRecordBtn').addEventListener('click',()=>{volRecs=[];$('recordTbody').innerHTML='<tr><td colspan="9" style="color:#666;padding:30px;">已清空</td></tr>';});
+$('revealBtn2').addEventListener('click',()=>{$('knowledgeReveal2').style.display='block';$('revealBtn2').style.display='none';});
 
 // ===== Game =====
-let gs = 0, gt = 0, gA = false, gQ = null;
+let gs=0,gt=0,gA=false,gQ=null;
 function ri(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
-function sh(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
+function sh(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 
-function genQ() {
+function genQ(){
   for(let t=0;t<50;t++){
     const tp=ri(1,4);let q=null;
-    if(tp===1){const r=ri(1,8),h=ri(2,10),ans=Math.round(Math.PI*r*r*h*100)/100;const ws=new Set([ans]);while(ws.size<4)ws.add(Math.round((ans+ri(-8,8)*ri(1,3))*100)/100);q={t:`底面半径 <b>${r}</b> cm，高 <b>${h}</b> cm 的圆柱，体积是多少 cm³？（π≈3.14）`,a:ans,opts:sh([...ws].filter(v=>v>0).slice(0,4))};}
-    else if(tp===2){const r=ri(1,6),h=ri(3,12),ans=Math.round(Math.PI*r*r*h/3*100)/100;const ws=new Set([ans]);while(ws.size<4){let w=Math.round((ans+ri(-5,5)*ri(1,3))*100)/100;if(w<=0)w=Math.round(ans*ri(2,5)*100)/100;ws.add(w);}q={t:`底面半径 <b>${r}</b> cm，高 <b>${h}</b> cm 的圆锥，体积是多少 cm³？（π≈3.14）`,a:ans,opts:sh([...ws].filter(v=>v>0).slice(0,4))};}
-    else if(tp===3){const r=ri(2,6),h=ri(2,8),v=Math.round(Math.PI*r*r*h*100)/100;if(Math.random()>0.5){const ws=new Set([r]);while(ws.size<4)ws.add(r+ri(-2,4));q={t:`圆柱体积 <b>${v.toFixed(2)}</b> cm³，高 <b>${h}</b> cm。底面半径约多少 cm？`,a:r,opts:sh([...ws].filter(x=>x>0).slice(0,4))};}else{const ws=new Set([h]);while(ws.size<4)ws.add(h+ri(-3,6));q={t:`圆柱体积 <b>${v.toFixed(2)}</b> cm³，半径 <b>${r}</b> cm。高约多少 cm？`,a:h,opts:sh([...ws].filter(x=>x>0).slice(0,4))};}}
-    else{const r=ri(2,7),h=ri(3,9),cv=Math.round(Math.PI*r*r*h*100)/100,ans=Math.round(cv/3*100)/100;q={t:`底面半径 <b>${r}</b> cm，高 <b>${h}</b> cm。等底等高圆柱体积 <b>${cv.toFixed(2)}</b> cm³。圆锥体积？`,a:ans,opts:sh([ans,Math.round(cv*2/3*100)/100,Math.round(cv*0.4*100)/100,Math.round(cv*0.25*100)/100])};}
+    if(tp===1){const r=ri(1,8),h=ri(2,10),ans=Math.round(PI*r*r*h*100)/100;const ws=new Set([ans]);while(ws.size<4)ws.add(Math.round((ans+ri(-8,8)*ri(1,3))*100)/100);q={t:`底面半径 <b>${r}</b> cm，高 <b>${h}</b> cm 的圆柱，体积是多少 cm³？（π≈3.14）`,a:ans,opts:sh([...ws].filter(v=>v>0).slice(0,4))};}
+    else if(tp===2){const r=ri(1,6),h=ri(3,12),ans=Math.round(PI*r*r*h/3*100)/100;const ws=new Set([ans]);while(ws.size<4){let w=Math.round((ans+ri(-5,5)*ri(1,3))*100)/100;if(w<=0)w=Math.round(ans*ri(2,5)*100)/100;ws.add(w);}q={t:`底面半径 <b>${r}</b> cm，高 <b>${h}</b> cm 的圆锥，体积是多少 cm³？（π≈3.14）`,a:ans,opts:sh([...ws].filter(v=>v>0).slice(0,4))};}
+    else if(tp===3){const r=ri(2,6),h=ri(2,8),v=Math.round(PI*r*r*h*100)/100;if(Math.random()>0.5){const ws=new Set([r]);while(ws.size<4)ws.add(r+ri(-2,4));q={t:`圆柱体积 <b>${v.toFixed(2)}</b> cm³，高 <b>${h}</b> cm。底面半径约多少 cm？`,a:r,opts:sh([...ws].filter(x=>x>0).slice(0,4))};}else{const ws=new Set([h]);while(ws.size<4)ws.add(h+ri(-3,6));q={t:`圆柱体积 <b>${v.toFixed(2)}</b> cm³，半径 <b>${r}</b> cm。高约多少 cm？`,a:h,opts:sh([...ws].filter(x=>x>0).slice(0,4))};}}
+    else{const r=ri(2,7),h=ri(3,9),cv=Math.round(PI*r*r*h*100)/100,ans=Math.round(cv/3*100)/100;q={t:`底面半径 <b>${r}</b> cm，高 <b>${h}</b> cm。等底等高圆柱体积 <b>${cv.toFixed(2)}</b> cm³。圆锥体积？`,a:ans,opts:sh([ans,Math.round(cv*2/3*100)/100,Math.round(cv*0.4*100)/100,Math.round(cv*0.25*100)/100])};}
     if(q&&q.opts.length>=3)return q;
   }
   return{t:'底面半径 3 cm，高 5 cm 的圆柱体积？',a:141.3,opts:sh([141.3,47.1,94.2,282.6])};
 }
 
-document.getElementById('startGameBtn2').addEventListener('click',()=>{gs=0;gt=0;document.getElementById('gameScore').textContent='0';document.getElementById('gameTotal').textContent='0';document.getElementById('startGameBtn2').style.display='none';document.getElementById('nextGameBtn2').style.display='inline-block';nextQ();});
-document.getElementById('nextGameBtn2').addEventListener('click',nextQ);
+$('startGameBtn2').addEventListener('click',()=>{gs=0;gt=0;$('gameScore').textContent='0';$('gameTotal').textContent='0';$('startGameBtn2').style.display='none';$('nextGameBtn2').style.display='inline-block';nextQ();});
+$('nextGameBtn2').addEventListener('click',nextQ);
 
-function nextQ(){gA=false;gQ=genQ();document.getElementById('gameQuestion').innerHTML=gQ.t;document.getElementById('gameFeedback').innerHTML='';document.getElementById('gameOptions').innerHTML=gQ.opts.map(o=>`<button class="game-option">${(o===Math.floor(o)?o:o.toFixed(2)).replace(/\.?0+$/,'')} cm³</button>`).join('');document.querySelectorAll('.game-option').forEach((b,i)=>b.addEventListener('click',()=>ansQ(i,b)));}
+function nextQ(){gA=false;gQ=genQ();$('gameQuestion').innerHTML=gQ.t;$('gameFeedback').innerHTML='';$('gameOptions').innerHTML=gQ.opts.map(o=>`<button class="game-option">${(o===Math.floor(o)?o:o.toFixed(2)).replace(/\.?0+$/,'')} cm³</button>`).join('');document.querySelectorAll('.game-option').forEach((b,i)=>b.addEventListener('click',()=>ansQ(i,b)));}
 
-function ansQ(idx,btn){if(gA)return;gA=true;gt++;const ok=Math.abs(gQ.opts[idx]-gQ.a)<0.01;if(ok){gs++;btn.classList.add('correct');document.getElementById('gameFeedback').innerHTML='✅ 正确！';}else{btn.classList.add('wrong');document.querySelectorAll('.game-option').forEach((b,i)=>{if(Math.abs(gQ.opts[i]-gQ.a)<0.01)b.classList.add('correct');});document.getElementById('gameFeedback').innerHTML='❌ 再想想！';}document.getElementById('gameScore').textContent=gs;document.getElementById('gameTotal').textContent=gt;document.querySelectorAll('.game-option').forEach(b=>b.style.pointerEvents='none');}
+function ansQ(idx,btn){if(gA)return;gA=true;gt++;const ok=Math.abs(gQ.opts[idx]-gQ.a)<0.01;if(ok){gs++;btn.classList.add('correct');$('gameFeedback').innerHTML='✅ 正确！';}else{btn.classList.add('wrong');document.querySelectorAll('.game-option').forEach((b,i)=>{if(Math.abs(gQ.opts[i]-gQ.a)<0.01)b.classList.add('correct');});$('gameFeedback').innerHTML='❌ 再想想！';}$('gameScore').textContent=gs;$('gameTotal').textContent=gt;document.querySelectorAll('.game-option').forEach(b=>b.style.pointerEvents='none');}
 
-// ===== Init =====
-function initApplet(tab) {
-  appletsLoaded[tab] = true;
-  setTimeout(() => {
-    if (tab === 'rotate') initSweep();
-    else if (tab === 'explore') initExplore();
-    else if (tab === 'unfold') initUnfold();
-    else if (tab === 'volume') initVolume();
-  }, 100);
+// Resize
+function resizeCanvases(){
+  [['cvSweep',900,500],['cvExplore',900,500],['cvUnfold',900,500],['cvVolume',900,500]].forEach(([id,w,h])=>{
+    const c=$(id);const p=c.parentElement;const mw=Math.min(p.clientWidth-32,w);const s=mw/w;c.style.width=mw+'px';c.style.height=(h*s)+'px';
+  });
 }
-
-// Start with sweep
-initApplet('rotate');
-
-window.addEventListener('resize', () => {
-  if (applets[currentTab]) resizeApplet(currentTab);
-});
+window.addEventListener('resize',resizeCanvases);
+resizeCanvases();
 </script>
 </body>
 </html>
