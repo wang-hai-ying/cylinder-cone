@@ -487,18 +487,18 @@ function drawUnfold(){
     const circR=r*px;
 
     if(arcAngle>0.01&&t>0.01){
-      // Sector's first radius aligns with the 3D generatrix from apex to basePt
+      // Sector fans counterclockwise from generatrix (expands rightward)
       const genAngle=Math.atan2(basePt.sy-apex.sy,basePt.sx-apex.sx);
       ctxU.fillStyle='rgba(255,210,0,0.5)';ctxU.strokeStyle='#ffd200';ctxU.lineWidth=2;
       ctxU.beginPath();
       ctxU.moveTo(apex.sx,apex.sy);
-      ctxU.arc(apex.sx,apex.sy,secR,genAngle,genAngle+arcAngle);
+      ctxU.arc(apex.sx,apex.sy,secR,genAngle-arcAngle,genAngle);
       ctxU.closePath();ctxU.fill();ctxU.stroke();
 
       ctxU.fillStyle='#fff';ctxU.font='11px sans-serif';ctxU.textAlign='center';
-      const midA=genAngle+arcAngle/2;
+      const midA=genAngle-arcAngle/2;
       ctxU.fillText('母线='+slant.toFixed(1)+'cm',apex.sx+secR*0.4*Math.cos(midA),apex.sy+secR*0.4*Math.sin(midA));
-      ctxU.fillText('弧长=2πr='+(2*PI*r).toFixed(1)+'cm',apex.sx+secR*0.7*Math.cos(genAngle+arcAngle*0.7),apex.sy+secR*0.7*Math.sin(genAngle+arcAngle*0.7));
+      ctxU.fillText('弧长=2πr='+(2*PI*r).toFixed(1)+'cm',apex.sx+secR*0.7*Math.cos(genAngle-arcAngle*0.7),apex.sy+secR*0.7*Math.sin(genAngle-arcAngle*0.7));
     }
 
     // Base circle
