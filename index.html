@@ -465,6 +465,12 @@ function drawUnfold(){
       ctxU.beginPath();ctxU.moveTo(genX,genTop.sy);ctxU.lineTo(genX,genBot.sy);ctxU.stroke();
       ctxU.setLineDash([]);
     }
+
+    // Formulas at bottom
+    const latCyl=2*PI*r*h, surCyl=2*PI*r*r+latCyl;
+    ctxU.fillStyle='#aaa';ctxU.font='13px sans-serif';ctxU.textAlign='center';
+    ctxU.fillText('S侧 = 底面周长×高 = 2πrh = '+latCyl.toFixed(1)+' cm²',cx3d+200,H-30);
+    ctxU.fillText('S表 = 2S底+S侧 = 2πr²+2πrh = '+surCyl.toFixed(1)+' cm²',cx3d+200,H-10);
   }else{
     // 3D cone centered in left portion
     const cx3d=160,cy3d=H/2+60,s3d=42;
@@ -512,6 +518,12 @@ function drawUnfold(){
       ctxU.beginPath();ctxU.moveTo(basePt.sx,basePt.sy);ctxU.lineTo(apex.sx,apex.sy);ctxU.stroke();
       ctxU.setLineDash([]);
     }
+
+    // Formulas at bottom
+    const latCone=PI*r*slant, surCone=PI*r*r+latCone;
+    ctxU.fillStyle='#aaa';ctxU.font='13px sans-serif';ctxU.textAlign='center';
+    ctxU.fillText('S侧 = πrl = '+latCone.toFixed(1)+' cm²  (l=母线长='+slant.toFixed(1)+')',cx3d+220,H-30);
+    ctxU.fillText('S表 = S底+S侧 = πr²+πrl = '+surCone.toFixed(1)+' cm²',cx3d+220,H-10);
   }
 }
 
