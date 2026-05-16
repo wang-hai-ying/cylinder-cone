@@ -203,43 +203,42 @@ function drawSweep(){
   ctxS.clearRect(0,0,W,H);
   ctxS.fillStyle='#1a1a2e';ctxS.fillRect(0,0,W,H);
 
-  const cx=W/2-40,cy=H/2,scale=55;
-  // View: looking down slightly, Z axis goes left-right (horizontal)
-  const ax=-0.25,ay=1.0;
+  const cx=W/2-80,cy=H/2+30,scale=55;
+  // Near-frontal view: vertical axis stays vertical
+  const ax=-0.15,ay=0.25;
   const r=2.8,h=5;
   const ang=sweepDeg*PI/180;
 
-  // Horizontal axis (Z-axis)
+  // Vertical rotation axis (Y-axis)
   ctxS.strokeStyle='rgba(255,80,80,0.8)';ctxS.lineWidth=2;ctxS.setLineDash([6,4]);
-  let lft=project3D(0,0,-h/2-1,cx,cy,scale,ax,ay);
-  let rgt=project3D(0,0,h/2+1,cx,cy,scale,ax,ay);
-  ctxS.beginPath();ctxS.moveTo(lft.sx,lft.sy);ctxS.lineTo(rgt.sx,rgt.sy);ctxS.stroke();
+  let top=project3D(0,h+1,0,cx,cy,scale,ax,ay);
+  let bot=project3D(0,-1,0,cx,cy,scale,ax,ay);
+  ctxS.beginPath();ctxS.moveTo(top.sx,top.sy);ctxS.lineTo(bot.sx,bot.sy);ctxS.stroke();
   ctxS.setLineDash([]);
-  ctxS.fillStyle='#ff6666';ctxS.font='13px sans-serif';ctxS.textAlign='center';
-  ctxS.fillText('旋转轴',rgt.sx+20,rgt.sy-6);
+  ctxS.fillStyle='#ff6666';ctxS.font='13px sans-serif';ctxS.textAlign='left';
+  ctxS.fillText('旋转轴',top.sx+6,top.sy-6);
 
   const segs=36, segsDone=Math.floor(segs*ang/(2*PI));
 
   if(sweepMode==='cylinder'){
-    // Trail surface: Z is cylinder axis, XZ plane contains circle
+    // Trail: cylinder surface around Y axis
     for(let i=0;i<Math.min(segsDone,segs);i++){
       const a=i*2*PI/segs, a2=(i+1)*2*PI/segs;
-      let p1l=project3D(r*Math.cos(a),r*Math.sin(a),-h/2,cx,cy,scale,ax,ay);
-      let p1r=project3D(r*Math.cos(a),r*Math.sin(a),h/2,cx,cy,scale,ax,ay);
-      let p2l=project3D(r*Math.cos(a2),r*Math.sin(a2),-h/2,cx,cy,scale,ax,ay);
-      let p2r=project3D(r*Math.cos(a2),r*Math.sin(a2),h/2,cx,cy,scale,ax,ay);
-      ctxS.beginPath();ctxS.moveTo(p1l.sx,p1l.sy);ctxS.lineTo(p1r.sx,p1r.sy);
-      ctxS.lineTo(p2r.sx,p2r.sy);ctxS.lineTo(p2l.sx,p2l.sy);ctxS.closePath();
+      let p1b=project3D(r*Math.cos(a),0,r*Math.sin(a),cx,cy,scale,ax,ay);
+      let p1t=project3D(r*Math.cos(a),h,r*Math.sin(a),cx,cy,scale,ax,ay);
+      let p2b=project3D(r*Math.cos(a2),0,r*Math.sin(a2),cx,cy,scale,ax,ay);
+      let p2t=project3D(r*Math.cos(a2),h,r*Math.sin(a2),cx,cy,scale,ax,ay);
+      ctxS.beginPath();ctxS.moveTo(p1b.sx,p1b.sy);ctxS.lineTo(p1t.sx,p1t.sy);
+      ctxS.lineTo(p2t.sx,p2t.sy);ctxS.lineTo(p2b.sx,p2b.sy);ctxS.closePath();
       ctxS.fillStyle='rgba(79,195,247,0.25)';ctxS.fill();
       ctxS.strokeStyle='rgba(79,195,247,0.4)';ctxS.lineWidth=0.5;ctxS.stroke();
     }
   }else{
-    // Cone trail
     for(let i=0;i<Math.min(segsDone,segs);i++){
       const a=i*2*PI/segs, a2=(i+1)*2*PI/segs;
-      let p1=project3D(r*Math.cos(a),r*Math.sin(a),-h/2,cx,cy,scale,ax,ay);
-      let p2=project3D(r*Math.cos(a2),r*Math.sin(a2),-h/2,cx,cy,scale,ax,ay);
-      let apex=project3D(0,0,h/2,cx,cy,scale,ax,ay);
+      let p1=project3D(r*Math.cos(a),0,r*Math.sin(a),cx,cy,scale,ax,ay);
+      let p2=project3D(r*Math.cos(a2),0,r*Math.sin(a2),cx,cy,scale,ax,ay);
+      let apex=project3D(0,h,0,cx,cy,scale,ax,ay);
       ctxS.beginPath();ctxS.moveTo(p1.sx,p1.sy);ctxS.lineTo(p2.sx,p2.sy);ctxS.lineTo(apex.sx,apex.sy);ctxS.closePath();
       ctxS.fillStyle='rgba(79,195,247,0.25)';ctxS.fill();
       ctxS.strokeStyle='rgba(79,195,247,0.4)';ctxS.lineWidth=0.5;ctxS.stroke();
@@ -249,24 +248,23 @@ function drawSweep(){
   // Rotating face
   const ca=Math.cos(ang),sa=Math.sin(ang);
   if(sweepMode==='cylinder'){
-    // Rectangle in XY plane at angle
-    let o1=project3D(0,0,-h/2,cx,cy,scale,ax,ay);
-    let o2=project3D(0,0,h/2,cx,cy,scale,ax,ay);
-    let a1=project3D(r*ca,r*sa,-h/2,cx,cy,scale,ax,ay);
-    let a2=project3D(r*ca,r*sa,h/2,cx,cy,scale,ax,ay);
-    ctxS.beginPath();ctxS.moveTo(o1.sx,o1.sy);ctxS.lineTo(o2.sx,o2.sy);ctxS.lineTo(a2.sx,a2.sy);ctxS.lineTo(a1.sx,a1.sy);ctxS.closePath();
+    let o=project3D(0,0,0,cx,cy,scale,ax,ay);
+    let a1=project3D(r*ca,0,r*sa,cx,cy,scale,ax,ay);
+    let b1=project3D(r*ca,h,r*sa,cx,cy,scale,ax,ay);
+    let ot=project3D(0,h,0,cx,cy,scale,ax,ay);
+    ctxS.beginPath();ctxS.moveTo(o.sx,o.sy);ctxS.lineTo(a1.sx,a1.sy);ctxS.lineTo(b1.sx,b1.sy);ctxS.lineTo(ot.sx,ot.sy);ctxS.closePath();
     ctxS.fillStyle='rgba(255,140,0,0.55)';ctxS.fill();
     ctxS.strokeStyle='#ff8c00';ctxS.lineWidth=2;ctxS.stroke();
   }else{
-    let o=project3D(0,0,-h/2,cx,cy,scale,ax,ay);
-    let a1=project3D(r*ca,r*sa,-h/2,cx,cy,scale,ax,ay);
-    let apex=project3D(0,0,h/2,cx,cy,scale,ax,ay);
+    let o=project3D(0,0,0,cx,cy,scale,ax,ay);
+    let a1=project3D(r*ca,0,r*sa,cx,cy,scale,ax,ay);
+    let apex=project3D(0,h,0,cx,cy,scale,ax,ay);
     ctxS.beginPath();ctxS.moveTo(o.sx,o.sy);ctxS.lineTo(a1.sx,a1.sy);ctxS.lineTo(apex.sx,apex.sy);ctxS.closePath();
     ctxS.fillStyle='rgba(255,140,0,0.55)';ctxS.fill();
     ctxS.strokeStyle='#ff8c00';ctxS.lineWidth=2;ctxS.stroke();
   }
 
-  // Fixed base outline at z=-h/2
+  // Fixed base outline
   ctxS.strokeStyle='rgba(255,140,0,0.35)';ctxS.lineWidth=1;ctxS.setLineDash([3,3]);
   drawSweepEllipse(ctxS,cx,cy,r,scale,ax,ay);
   ctxS.setLineDash([]);
@@ -274,10 +272,9 @@ function drawSweep(){
 
 function drawSweepEllipse(ctx,cx,cy,r,scale,ax,ay){
   ctx.beginPath();
-  const pts=65;
-  for(let i=0;i<=pts;i++){
+  for(let i=0;i<=64;i++){
     let a=(i/64)*2*PI;
-    let p=project3D(r*Math.cos(a),r*Math.sin(a),-2.5,cx,cy,scale,ax,ay);
+    let p=project3D(r*Math.cos(a),0,r*Math.sin(a),cx,cy,scale,ax,ay);
     if(i===0)ctx.moveTo(p.sx,p.sy);else ctx.lineTo(p.sx,p.sy);
   }
   ctx.stroke();
@@ -311,13 +308,13 @@ drawSweep();
 
 // ===== 3D 探究 =====
 const cvExplore=$('cvExplore'),ctxE=cvExplore.getContext('2d');
-let exploreShape='cylinder',eR=3,eH=5,eDrag=false,eAngleX=-0.4,eAngleY=0.8,eLastX=0,eLastY=0;
+let exploreShape='cylinder',eR=3,eH=5,eDrag=false,eAngleX=-0.3,eAngleY=0.35,eLastX=0,eLastY=0;
 
 function drawExplore(){
   const W=cvExplore.width,H=cvExplore.height;
   ctxE.clearRect(0,0,W,H);
   ctxE.fillStyle='#1a1a2e';ctxE.fillRect(0,0,W,H);
-  const cx=W/2,cy=H/2,scale=55;
+  const cx=W/2,cy=H/2+20,scale=55;
   const ax=eAngleX,ay=eAngleY,r=eR,h=eH;
 
   // Horizontal reference line
@@ -338,37 +335,36 @@ function drawExplore(){
 
 function drawCylinder3D(ctx,cx,cy,s,ax,ay,r,h,offX,offZ,fc,sc){
   const segs=48;
-  // Cylinder axis along Z (horizontal-ish), base circles in XY plane
+  // Y is vertical (cylinder stands upright), base in XZ plane
   for(let i=0;i<segs;i++){
     const a1=i*2*PI/segs,a2=(i+1)*2*PI/segs;
-    let p1l=project3D(offX+r*Math.cos(a1),r*Math.sin(a1),offZ-h/2,cx,cy,s,ax,ay);
-    let p1r=project3D(offX+r*Math.cos(a1),r*Math.sin(a1),offZ+h/2,cx,cy,s,ax,ay);
-    let p2l=project3D(offX+r*Math.cos(a2),r*Math.sin(a2),offZ-h/2,cx,cy,s,ax,ay);
-    let p2r=project3D(offX+r*Math.cos(a2),r*Math.sin(a2),offZ+h/2,cx,cy,s,ax,ay);
-    ctx.beginPath();ctx.moveTo(p1l.sx,p1l.sy);ctx.lineTo(p1r.sx,p1r.sy);ctx.lineTo(p2r.sx,p2r.sy);ctx.lineTo(p2l.sx,p2l.sy);ctx.closePath();
+    let p1b=project3D(offX+r*Math.cos(a1),0,offZ+r*Math.sin(a1),cx,cy,s,ax,ay);
+    let p1t=project3D(offX+r*Math.cos(a1),h,offZ+r*Math.sin(a1),cx,cy,s,ax,ay);
+    let p2b=project3D(offX+r*Math.cos(a2),0,offZ+r*Math.sin(a2),cx,cy,s,ax,ay);
+    let p2t=project3D(offX+r*Math.cos(a2),h,offZ+r*Math.sin(a2),cx,cy,s,ax,ay);
+    ctx.beginPath();ctx.moveTo(p1b.sx,p1b.sy);ctx.lineTo(p1t.sx,p1t.sy);ctx.lineTo(p2t.sx,p2t.sy);ctx.lineTo(p2b.sx,p2b.sy);ctx.closePath();
     ctx.fillStyle=fc;ctx.fill();ctx.strokeStyle=sc;ctx.lineWidth=0.5;ctx.stroke();
   }
-  // End caps (ellipses at z=-h/2 and z=+h/2)
-  for(let e=-1;e<=1;e+=2){
-    let pts=[];for(let i=0;i<=segs;i++){let a=i*2*PI/segs;pts.push(project3D(offX+r*Math.cos(a),r*Math.sin(a),offZ+e*h/2,cx,cy,s,ax,ay));}
-    ctx.beginPath();ctx.moveTo(pts[0].sx,pts[0].sy);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].sx,pts[i].sy);
-    ctx.fillStyle=e>0?'rgba(255,160,60,0.3)':'rgba(255,140,60,0.25)';ctx.fill();ctx.strokeStyle='rgba(255,180,80,0.7)';ctx.lineWidth=1.5;ctx.stroke();
-  }
+  let topp=[];for(let i=0;i<=segs;i++){let a=i*2*PI/segs;topp.push(project3D(offX+r*Math.cos(a),h,offZ+r*Math.sin(a),cx,cy,s,ax,ay));}
+  ctx.beginPath();ctx.moveTo(topp[0].sx,topp[0].sy);for(let i=1;i<topp.length;i++)ctx.lineTo(topp[i].sx,topp[i].sy);
+  ctx.fillStyle='rgba(255,160,60,0.3)';ctx.fill();ctx.strokeStyle='rgba(255,180,80,0.7)';ctx.lineWidth=1.5;ctx.stroke();
+  let botp=[];for(let i=0;i<=segs;i++){let a=i*2*PI/segs;botp.push(project3D(offX+r*Math.cos(a),0,offZ+r*Math.sin(a),cx,cy,s,ax,ay));}
+  ctx.beginPath();ctx.moveTo(botp[0].sx,botp[0].sy);for(let i=1;i<botp.length;i++)ctx.lineTo(botp[i].sx,botp[i].sy);
+  ctx.fillStyle='rgba(255,140,60,0.25)';ctx.fill();ctx.strokeStyle='rgba(255,180,80,0.7)';ctx.lineWidth=1.5;ctx.stroke();
 }
 
 function drawCone3D(ctx,cx,cy,s,ax,ay,r,h,offX,offZ,fc,sc){
   const segs=48;
-  const apex=project3D(offX,0,offZ+h/2,cx,cy,s,ax,ay);
+  const apex=project3D(offX,h/2,offZ,cx,cy,s,ax,ay);
   for(let i=0;i<segs;i++){
     const a1=i*2*PI/segs,a2=(i+1)*2*PI/segs;
-    let p1=project3D(offX+r*Math.cos(a1),r*Math.sin(a1),offZ-h/2,cx,cy,s,ax,ay);
-    let p2=project3D(offX+r*Math.cos(a2),r*Math.sin(a2),offZ-h/2,cx,cy,s,ax,ay);
+    let p1=project3D(offX+r*Math.cos(a1),-h/2,offZ+r*Math.sin(a1),cx,cy,s,ax,ay);
+    let p2=project3D(offX+r*Math.cos(a2),-h/2,offZ+r*Math.sin(a2),cx,cy,s,ax,ay);
     ctx.beginPath();ctx.moveTo(p1.sx,p1.sy);ctx.lineTo(p2.sx,p2.sy);ctx.lineTo(apex.sx,apex.sy);ctx.closePath();
     ctx.fillStyle=fc;ctx.fill();ctx.strokeStyle=sc;ctx.lineWidth=0.5;ctx.stroke();
   }
-  // Base ellipse
-  let pts=[];for(let i=0;i<=segs;i++){let a=i*2*PI/segs;pts.push(project3D(offX+r*Math.cos(a),r*Math.sin(a),offZ-h/2,cx,cy,s,ax,ay));}
-  ctx.beginPath();ctx.moveTo(pts[0].sx,pts[0].sy);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].sx,pts[i].sy);
+  let botp=[];for(let i=0;i<=segs;i++){let a=i*2*PI/segs;botp.push(project3D(offX+r*Math.cos(a),-h/2,offZ+r*Math.sin(a),cx,cy,s,ax,ay));}
+  ctx.beginPath();ctx.moveTo(botp[0].sx,botp[0].sy);for(let i=1;i<botp.length;i++)ctx.lineTo(botp[i].sx,botp[i].sy);
   ctx.fillStyle='rgba(100,210,255,0.3)';ctx.fill();ctx.strokeStyle='rgba(120,220,255,0.7)';ctx.lineWidth=1.5;ctx.stroke();
 }
 
@@ -423,55 +419,60 @@ function drawUnfold(){
 
   if(unfoldShape==='cylinder'){
     // 3D view on left
-    const cx3d=180,cy3d=H/2,s3d=38;
-    if(t<0.98){ctxU.globalAlpha=1-t;drawCylinder3D(ctxU,cx3d,cy3d,s3d,-0.5,0.7,r,h,0,0,'rgba(255,140,0,0.5)','rgba(255,160,40,0.6)');ctxU.globalAlpha=1;}
+    const cx3d=170,cy3d=H/2,s3d=38;
+    const ax3d=-0.5,ay3d=0.7;
+    if(t<0.98){ctxU.globalAlpha=1-t;drawCylinder3D(ctxU,cx3d,cy3d,s3d,ax3d,ay3d,r,h,0,0,'rgba(255,140,0,0.5)','rgba(255,160,40,0.6)');ctxU.globalAlpha=1;}
 
-    // 2D Flat layout on right: two circles sandwiching the rectangle
-    const rectW=2*PI*r*px*t; // width of lateral rectangle
-    const rectH=h*px;         // height = h
-    const circR=r*px;         // circle radius = r
-    const cxFlat=480,cyFlat=H/2;
+    // Flat shapes start right at 3D model's right edge
+    const rectW=2*PI*r*px*t;
+    const rectH=h*px;
+    const circR=r*px;
+    // Rightmost point of 3D cyl ≈ cx3d + s3d*r (conservative)
+    const startX=cx3d+s3d*r+10;
+    const cxFlat=startX+rectW/2,cyFlat=cy3d;
+    const yGap=12;
 
-    // Top circle
-    const yGap=14;
-    ctxU.fillStyle='rgba(79,195,247,0.5)';ctxU.strokeStyle='rgba(79,195,247,0.8)';ctxU.lineWidth=2;
+    // Top circle (的上底)
+    ctxU.fillStyle='rgba(79,195,247,0.45)';ctxU.strokeStyle='rgba(79,195,247,0.7)';ctxU.lineWidth=2;
     ctxU.beginPath();ctxU.arc(cxFlat,cyFlat-rectH/2-yGap-circR,circR,0,2*PI);ctxU.fill();ctxU.stroke();
     ctxU.fillStyle='#fff';ctxU.font='12px sans-serif';ctxU.textAlign='center';
-    ctxU.fillText('底面圆 (r='+r.toFixed(1)+')',cxFlat,cyFlat-rectH/2-yGap-circR-circR-8);
+    ctxU.fillText('底面圆 (r='+r.toFixed(1)+')',cxFlat,cyFlat-rectH/2-yGap-circR-circR-6);
 
-    // Bottom circle
-    ctxU.fillStyle='rgba(79,195,247,0.5)';ctxU.strokeStyle='rgba(79,195,247,0.8)';ctxU.lineWidth=2;
+    // Bottom circle (的下底)
+    ctxU.fillStyle='rgba(79,195,247,0.45)';ctxU.strokeStyle='rgba(79,195,247,0.7)';ctxU.lineWidth=2;
     ctxU.beginPath();ctxU.arc(cxFlat,cyFlat+rectH/2+yGap+circR,circR,0,2*PI);ctxU.fill();ctxU.stroke();
-    ctxU.fillText('底面圆 (r='+r.toFixed(1)+')',cxFlat,cyFlat+rectH/2+yGap+circR+circR+16);
+    ctxU.fillText('底面圆 (r='+r.toFixed(1)+')',cxFlat,cyFlat+rectH/2+yGap+circR+circR+14);
 
-    // Lateral rectangle
+    // Lateral rectangle - right against the 3D model
     if(rectW>1){
       ctxU.fillStyle='rgba(255,210,0,0.5)';ctxU.strokeStyle='#ffd200';ctxU.lineWidth=2;
       ctxU.fillRect(cxFlat-rectW/2,cyFlat-rectH/2,rectW,rectH);
       ctxU.strokeRect(cxFlat-rectW/2,cyFlat-rectH/2,rectW,rectH);
-      ctxU.fillStyle='#fff';ctxU.font='13px sans-serif';
-      ctxU.fillText('长=2πr='+(2*PI*r).toFixed(1)+'cm',cxFlat,cyFlat-rectH/2-10);
-      ctxU.save();ctxU.translate(cxFlat-rectW/2-10,cyFlat);ctxU.rotate(-PI/2);
-      ctxU.fillText('宽=h='+h.toFixed(1)+'cm',0,0);ctxU.restore();
+      ctxU.fillStyle='#fff';ctxU.font='12px sans-serif';
+      if(rectW>40)ctxU.fillText('长=2πr='+(2*PI*r).toFixed(1),cxFlat,cyFlat-rectH/2-8);
+      ctxU.save();ctxU.translate(cxFlat-rectW/2-8,cyFlat);ctxU.rotate(-PI/2);
+      ctxU.fillText('宽=h='+h.toFixed(1),0,0);ctxU.restore();
     }
 
-    // Arrow
-    ctxU.strokeStyle='rgba(255,255,255,0.3)';ctxU.setLineDash([5,5]);ctxU.lineWidth=1;
-    ctxU.beginPath();ctxU.moveTo(230,cyFlat);ctxU.lineTo(cxFlat-rectW/2-20,cyFlat);ctxU.stroke();
+    // Faint connecting line from 3D to flat
+    ctxU.strokeStyle='rgba(255,255,255,0.15)';ctxU.setLineDash([4,4]);ctxU.lineWidth=1;
+    ctxU.beginPath();ctxU.moveTo(cx3d+s3d*r,cy3d);ctxU.lineTo(cxFlat-rectW/2,cy3d);ctxU.stroke();
     ctxU.setLineDash([]);
   }else{
     // 3D cone on left
-    const cx3d=180,cy3d=H/2,s3d=42;
-    if(t<0.98){ctxU.globalAlpha=1-t;drawCone3D(ctxU,cx3d,cy3d,s3d,-0.5,0.7,r,h,0,0,'rgba(79,195,247,0.5)','rgba(100,210,255,0.6)');ctxU.globalAlpha=1;}
+    const cx3d=160,cy3d=H/2,s3d=42;
+    const ax3d=-0.5,ay3d=0.7;
+    if(t<0.98){ctxU.globalAlpha=1-t;drawCone3D(ctxU,cx3d,cy3d,s3d,ax3d,ay3d,r,h,0,0,'rgba(79,195,247,0.5)','rgba(100,210,255,0.6)');ctxU.globalAlpha=1;}
 
-    // 2D Flat: sector + circle
+    // Flat: sector + circle, positioned right next to 3D
     const slant=Math.sqrt(r*r+h*h);
-    const arcAngle=(2*PI*r/slant)*t; // full arc when t=1
-    const cxFlat=500,cyFlat=H/2;
+    const arcAngle=(2*PI*r/slant)*t;
     const circR=r*px;
     const secR=slant*px;
+    const startX=cx3d+s3d*r+5;
+    const cxFlat=startX+secR,cyFlat=cy3d;
 
-    // Sector (lateral surface)
+    // Sector (lateral surface of cone)
     if(arcAngle>0.01&&t>0.01){
       ctxU.fillStyle='rgba(255,210,0,0.5)';ctxU.strokeStyle='#ffd200';ctxU.lineWidth=2;
       ctxU.beginPath();
@@ -479,18 +480,18 @@ function drawUnfold(){
       ctxU.arc(cxFlat,cyFlat,secR,-PI/2,-PI/2+arcAngle);
       ctxU.closePath();ctxU.fill();ctxU.stroke();
       ctxU.fillStyle='#fff';ctxU.font='12px sans-serif';ctxU.textAlign='center';
-      ctxU.fillText('母线长='+slant.toFixed(1)+'cm',cxFlat+secR*0.3,cyFlat-secR*0.4);
-      ctxU.fillText('弧长=2πr='+(2*PI*r).toFixed(1),cxFlat+secR*0.6,cyFlat+secR*0.3);
+      ctxU.fillText('母线='+slant.toFixed(1),cxFlat+secR*0.35,cyFlat-secR*0.35);
+      ctxU.fillText('弧长=2πr='+(2*PI*r).toFixed(1),cxFlat+secR*0.55,cyFlat+secR*0.3);
     }
 
-    // Base circle (always shown)
-    ctxU.fillStyle='rgba(79,195,247,0.5)';ctxU.strokeStyle='rgba(79,195,247,0.8)';ctxU.lineWidth=2;
-    ctxU.beginPath();ctxU.arc(cxFlat-90,cyFlat+90,circR,0,2*PI);ctxU.fill();ctxU.stroke();
-    ctxU.fillText('底面圆 (r='+r.toFixed(1)+')',cxFlat-90,cyFlat+90+circR+16);
+    // Base circle
+    ctxU.fillStyle='rgba(79,195,247,0.45)';ctxU.strokeStyle='rgba(79,195,247,0.7)';ctxU.lineWidth=2;
+    ctxU.beginPath();ctxU.arc(cxFlat-secR-circR-8,cyFlat+secR*0.4,circR,0,2*PI);ctxU.fill();ctxU.stroke();
+    ctxU.fillText('底面圆(r='+r.toFixed(1)+')',cxFlat-secR-circR-8,cyFlat+secR*0.4+circR+14);
 
-    // Arrow
-    ctxU.strokeStyle='rgba(255,255,255,0.3)';ctxU.setLineDash([5,5]);ctxU.lineWidth=1;
-    ctxU.beginPath();ctxU.moveTo(230,cyFlat);ctxU.lineTo(cxFlat-secR-10,cyFlat);ctxU.stroke();
+    // Connecting line
+    ctxU.strokeStyle='rgba(255,255,255,0.15)';ctxU.setLineDash([4,4]);ctxU.lineWidth=1;
+    ctxU.beginPath();ctxU.moveTo(cx3d+s3d*r,cy3d);ctxU.lineTo(cxFlat-secR,cy3d);ctxU.stroke();
     ctxU.setLineDash([]);
   }
 }
@@ -519,14 +520,14 @@ drawUnfold();
 
 // ===== 体积关系 =====
 const cvVolume=$('cvVolume'),ctxV=cvVolume.getContext('2d');
-let vR=3,vH=5,dragV=false,vAngX=-0.4,vAngY=0.8,vLX=0,vLY=0;
+let vR=3,vH=5,dragV=false,vAngX=-0.3,vAngY=0.4,vLX=0,vLY=0;
 
 function drawVolume(){
   const W=cvVolume.width,H=cvVolume.height;
   ctxV.clearRect(0,0,W,H);
   ctxV.fillStyle='#1a1a2e';ctxV.fillRect(0,0,W,H);
 
-  const cx=W/2,cy=H/2+20,scale=40;
+  const cx=W/2,cy=H/2+30,scale=45;
   const ax=vAngX,ay=vAngY,r=vR,h=vH;
   const gap=3;
 
