@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>圆柱与圆锥 — 数学探究实验室</title>
 <link rel="stylesheet" href="css/style.css">
+<script src="https://www.geogebra.org/apps/deployggb.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
+<style>
+.ggb-container { width:100%; height:500px; border-radius:16px; overflow:hidden; margin:15px 0; border:1px solid rgba(255,255,255,0.08); }
+.ggb-container .loading { text-align:center; padding:60px; color:#888; font-size:16px; }
+.ggb-container .loading .spin { display:inline-block; width:24px; height:24px; border:3px solid rgba(255,255,255,0.1); border-top-color:#f7971e; border-radius:50%; animation:sp 0.8s linear infinite; vertical-align:middle; margin-right:10px; }
+@keyframes sp { to{transform:rotate(360deg);} }
+</style>
 </head>
 <body>
 <div class="container">
@@ -23,113 +31,46 @@
 
   <div class="panel active" id="panel-rotate">
     <div class="mode-switch">
-      <button class="mode-btn active" data-mode="cylinder">🔵 长方形→圆柱</button>
-      <button class="mode-btn" data-mode="cone">🔺 三角形→圆锥</button>
+      <button class="mode-btn active" data-mode="cylinder">🔵 长方形 → 圆柱</button>
+      <button class="mode-btn" data-mode="cone">🔺 三角形 → 圆锥</button>
     </div>
-    <div class="canvas-area"><canvas id="sweepCanvas" width="900" height="500"></canvas></div>
-    <div class="sweep-controls">
-      <button class="btn btn-primary" id="sweepPlayBtn">▶️ 播放旋转动画</button>
-      <button class="btn btn-outline" id="sweepResetBtn">🔄 重置</button>
-      <label style="color:#bbb;font-size:14px;margin-left:12px;">速度：</label>
-      <input type="range" min="1" max="20" value="5" id="sweepSpeed" style="width:120px;">
-    </div>
+    <div class="ggb-container"><div id="ggb-rotate" style="width:100%;height:100%;"><div class="loading"><span class="spin"></span>加载中...</div></div></div>
     <div class="info-box">
-      <strong>💡 面动成体原理：</strong><br>
-      🔵 一个<span class="highlight">长方形</span>以它的一条边为轴旋转一周形成<span class="highlight">圆柱</span>。<br>
-      🔺 一个<span class="highlight">直角三角形</span>以它的一条直角边为轴旋转一周形成<span class="highlight">圆锥</span>。
+      <strong>💡 面动成体：</strong>拖动滑块 <span class="highlight">α</span> 控制旋转角度，观察长方形/三角形旋转一周如何形成圆柱/圆锥。
     </div>
   </div>
 
   <div class="panel" id="panel-explore">
-    <div class="mode-switch" id="exploreShapeSwitch">
+    <div class="mode-switch">
       <button class="mode-btn active" data-shape="cylinder">🔵 圆柱</button>
       <button class="mode-btn" data-shape="cone">🔺 圆锥</button>
     </div>
-    <div class="canvas-area"><canvas id="exploreCanvas" width="800" height="500"></canvas></div>
-    <div class="controls">
-      <div class="control-card" style="border-left:3px solid #f7971e;">
-        <h3>底面半径 r</h3>
-        <div class="control-row">
-          <input type="range" min="1" max="8" value="3" step="0.1" id="radiusSlider">
-          <input type="number" min="0.5" max="8" value="3" step="0.1" id="radiusInput">
-          <span class="unit">cm</span>
-        </div>
-      </div>
-      <div class="control-card" style="border-left:3px solid #4fc3f7;">
-        <h3>高 h</h3>
-        <div class="control-row">
-          <input type="range" min="1" max="12" value="5" step="0.1" id="heightSlider">
-          <input type="number" min="0.5" max="12" value="5" step="0.1" id="heightInput">
-          <span class="unit">cm</span>
-        </div>
-      </div>
-    </div>
+    <div class="ggb-container"><div id="ggb-explore" style="width:100%;height:100%;"><div class="loading"><span class="spin"></span>加载中...</div></div></div>
     <div class="data-row">
       <div class="data-item"><div class="label">底面积</div><div class="value" id="valArea">28.27</div><div class="unit">cm²</div></div>
-      <div class="data-item"><div class="label">底面周长</div><div class="value" id="valCircum">18.85</div><div class="unit">cm</div></div>
       <div class="data-item"><div class="label">侧面积</div><div class="value" id="valLateral">94.25</div><div class="unit">cm²</div></div>
-      <div class="data-item"><div class="label">表面积</div><div class="value" id="valSurface">150.80</div><div class="unit">cm²</div></div>
       <div class="data-item"><div class="label">体积</div><div class="value" id="valVolume">141.37</div><div class="unit">cm³</div></div>
     </div>
   </div>
 
   <div class="panel" id="panel-unfold">
-    <div class="mode-switch" id="unfoldShapeSwitch">
+    <div class="mode-switch">
       <button class="mode-btn active" data-unfold="cylinder">🔵 圆柱展开</button>
       <button class="mode-btn" data-unfold="cone">🔺 圆锥展开</button>
     </div>
-    <div class="canvas-area"><canvas id="unfoldCanvas" width="900" height="500"></canvas></div>
-    <div class="sweep-controls">
-      <button class="btn btn-primary" id="unfoldBtn">📐 展开</button>
-      <button class="btn btn-outline" id="unfoldResetBtn">🔄 还原</button>
-    </div>
-    <div class="controls">
-      <div class="control-card" style="border-left:3px solid #f7971e;">
-        <h3>底面半径 r</h3>
-        <div class="control-row">
-          <input type="range" min="1" max="6" value="3" step="0.1" id="unfoldRadiusSlider">
-          <input type="number" min="0.5" max="6" value="3" step="0.1" id="unfoldRadiusInput">
-          <span class="unit">cm</span>
-        </div>
-      </div>
-      <div class="control-card" style="border-left:3px solid #4fc3f7;">
-        <h3>高 h</h3>
-        <div class="control-row">
-          <input type="range" min="1" max="10" value="5" step="0.1" id="unfoldHeightSlider">
-          <input type="number" min="0.5" max="10" value="5" step="0.1" id="unfoldHeightInput">
-          <span class="unit">cm</span>
-        </div>
-      </div>
-    </div>
+    <div class="ggb-container"><div id="ggb-unfold" style="width:100%;height:100%;"><div class="loading"><span class="spin"></span>加载中...</div></div></div>
+    <div style="text-align:center;color:#bbb;font-size:14px;margin:8px 0;">👆 拖动 <b style="color:#f7971e;">t</b> 滑块控制展开程度，拖动 <b style="color:#f7971e;">r、h</b> 改变尺寸</div>
   </div>
 
   <div class="panel" id="panel-volume">
-    <div class="canvas-area"><canvas id="volumeCanvas" width="900" height="500"></canvas></div>
-    <div class="controls">
-      <div class="control-card" style="border-left:3px solid #f7971e;">
-        <h3>底面半径 r</h3>
-        <div class="control-row">
-          <input type="range" min="1" max="6" value="3" step="0.1" id="volRadiusSlider">
-          <input type="number" min="0.5" max="6" value="3" step="0.1" id="volRadiusInput">
-          <span class="unit">cm</span>
-        </div>
-      </div>
-      <div class="control-card" style="border-left:3px solid #4fc3f7;">
-        <h3>高 h</h3>
-        <div class="control-row">
-          <input type="range" min="1" max="10" value="5" step="0.1" id="volHeightSlider">
-          <input type="number" min="0.5" max="10" value="5" step="0.1" id="volHeightInput">
-          <span class="unit">cm</span>
-        </div>
-      </div>
-    </div>
+    <div class="ggb-container"><div id="ggb-volume" style="width:100%;height:100%;"><div class="loading"><span class="spin"></span>加载中...</div></div></div>
     <div class="data-row">
       <div class="data-item"><div class="label">圆柱体积</div><div class="value" id="valCylVol">141.37</div><div class="unit">cm³</div></div>
       <div class="data-item"><div class="label">圆锥体积</div><div class="value" id="valConeVol">47.12</div><div class="unit">cm³</div></div>
       <div class="data-item"><div class="label">V柱 : V锥</div><div class="value" id="valRatio">3 : 1</div></div>
     </div>
     <div class="info-box">
-      <strong>💡 核心规律：</strong>等底等高的<span class="highlight">圆柱体积 = 圆锥体积的 3 倍</span>，即 V锥 = ⅓πr²h
+      <strong>💡 核心规律：</strong>等底等高时，<span class="highlight">圆柱体积 = 圆锥体积的 3 倍</span>。拖动 r 和 h 滑块验证。
     </div>
   </div>
 
@@ -139,14 +80,11 @@
       <button class="btn btn-outline" id="clearRecordBtn">🗑️ 清空</button>
     </div>
     <table class="record-table"><thead><tr><th>#</th><th>r</th><th>h</th><th>S底</th><th>V柱</th><th>V锥</th><th>V柱:V锥</th><th>r²</th><th>V柱/r²</th></tr></thead><tbody id="recordTbody"><tr><td colspan="9" style="color:#666;padding:30px;">在"体积关系"中调整半径和高后，点击记录</td></tr></tbody></table>
-    <div class="info-box">
-      <strong>📐 探究任务：</strong>保持高不变半径×2→体积×? 保持半径不变高×2→体积×? V柱:V锥始终3:1?
-    </div>
     <div style="margin:15px 0;padding:16px;background:rgba(76,175,80,0.08);border-radius:12px;border:1px solid rgba(76,175,80,0.2);">
       <strong style="color:#81c784;">📖 知识点：</strong>
       <div style="margin-top:10px;line-height:1.9;font-size:14px;display:none;" id="knowledgeReveal2">
-        🔹 V柱 = πr²h &nbsp; 🔹 V锥 = ⅓πr²h &nbsp; 🔹 V柱 = 3×V锥<br>
-        🔹 r×2→V×4（V∝r²）&nbsp; 🔹 h×2→V×2（V∝h）
+        🔹 V柱 = πr²h &nbsp; 🔹 V锥 = ⅓πr²h &nbsp; 🔹 V柱 = 3 × V锥<br>
+        🔹 r×2 → V×4（V∝r²）&nbsp; 🔹 h×2 → V×2（V∝h）
       </div>
       <button class="btn btn-sm btn-outline" id="revealBtn2">🔓 查看规律</button>
     </div>
@@ -166,15 +104,10 @@
   </div>
 </div>
 
-<script type="importmap">
-{"imports":{"three":"https://esm.sh/three@0.160.0","three/":"https://esm.sh/three@0.160.0/"}}
-</script>
-<script type="module">
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-
-// ========== Tab ==========
+<script>
+// ===== Tab =====
 let currentTab = 'rotate';
+const applets = {}, appletsLoaded = {};
 document.getElementById('tabBar').addEventListener('click', e => {
   if (!e.target.classList.contains('tab-btn')) return;
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -182,291 +115,309 @@ document.getElementById('tabBar').addEventListener('click', e => {
   currentTab = e.target.dataset.tab;
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-' + currentTab).classList.add('active');
-  if (currentTab === 'explore') initExplore3D();
+  if (!appletsLoaded[currentTab]) initApplet(currentTab);
+  else if (applets[currentTab]) resizeApplet(currentTab);
 });
 
-// ========== Sweep ==========
-const sweepCanvas = document.getElementById('sweepCanvas');
-const sweepScene = new THREE.Scene();
-sweepScene.background = new THREE.Color(0x1a1a2e);
-const sweepCam = new THREE.PerspectiveCamera(50, 900 / 500, 0.1, 50);
-sweepCam.position.set(8, 4, 10); sweepCam.lookAt(0, 0, 0);
-const sweepR = new THREE.WebGLRenderer({ canvas: sweepCanvas, alpha: true, antialias: true });
-sweepR.setSize(900, 500);
-sweepScene.add(new THREE.GridHelper(10, 10, 0x444444, 0x222222));
-sweepScene.add(new THREE.AmbientLight(0x666666, 2));
-const sdl = new THREE.DirectionalLight(0xffffff, 2); sdl.position.set(5, 10, 8); sweepScene.add(sdl);
-
-let sweepMode = 'cylinder', sweepAngle = 0, sweepPlaying = false, sweepSpeed = 0.03;
-const shapeG = new THREE.Group(), trailG = new THREE.Group();
-sweepScene.add(shapeG); sweepScene.add(trailG);
-let axisLine;
-
-function makeAxis() {
-  if (axisLine) sweepScene.remove(axisLine);
-  const g = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, -4, 0), new THREE.Vector3(0, 4, 0)]);
-  axisLine = new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0xff4444 }));
-  sweepScene.add(axisLine);
+function resizeApplet(key) {
+  const el = document.getElementById('ggb-' + key);
+  if (!el || !applets[key]) return;
+  const w = el.parentElement.clientWidth;
+  applets[key].setSize(w, 500);
 }
 
-function makeSweep() {
-  shapeG.clear(); trailG.clear();
+// ===== Create GGB Applet =====
+function createApplet(id, appName, onLoad) {
+  const params = {
+    id: id,
+    appName: appName,
+    width: 900, height: 500,
+    showToolBar: false, showAlgebraInput: false, showMenuBar: false,
+    enableShiftDragZoom: true,
+    borderColor: '#302b63',
+    appletOnLoad: function(api) { onLoad(api); }
+  };
+  const applet = new GGBApplet(params, true);
+  applet.inject('ggb-' + id);
+}
+
+// ===== 面动成体 =====
+let sweepApi = null, sweepMode = 'cylinder';
+function initSweep() {
+  createApplet('rotate', '3d', function(api) {
+    sweepApi = api;
+    buildSweepScene();
+  });
+}
+
+function buildSweepScene() {
+  const api = sweepApi;
+  api.evalCommand('O=(0,0,0)');
+  api.evalCommand('AxisLine=Segment((0,0,-1),(0,0,7))');
+  api.evalCommand('SetColor(AxisLine,"red")');
+  api.evalCommand('SetLineStyle(AxisLine,2)');
+  api.evalCommand('α=Slider(0°,360°,1°)');
+  api.evalCommand('SetCaption(α,"旋转角度 α")');
+
   if (sweepMode === 'cylinder') {
-    const r = 3, h = 5;
-    shapeG.add(new THREE.Mesh(new THREE.PlaneGeometry(r, h), new THREE.MeshBasicMaterial({ color: 0xf7971e, side: THREE.DoubleSide, transparent: true, opacity: 0.7 })).translateX(r / 2));
-    shapeG.add(new THREE.Mesh(new THREE.PlaneGeometry(r, h), new THREE.MeshBasicMaterial({ color: 0xffaa00, wireframe: true, transparent: true, opacity: 0.5 })).translateX(r / 2));
+    api.evalCommand('r=3');
+    api.evalCommand('h=5');
+    // Original rectangle
+    api.evalCommand('A1=(r,0,0)');
+    api.evalCommand('B1=(r,0,h)');
+    api.evalCommand('rect1=Polygon((0,0,0),A1,B1,(0,0,h))');
+    api.evalCommand('SetColor(rect1,"orange")');
+    api.evalCommand('SetFilling(rect1,0.5)');
+    // Rotated rectangle
+    api.evalCommand('A2=(r cos(α), r sin(α), 0)');
+    api.evalCommand('B2=(r cos(α), r sin(α), h)');
+    api.evalCommand('rect2=Polygon((0,0,0),A2,B2,(0,0,h))');
+    api.evalCommand('SetColor(rect2,"blue")');
+    api.evalCommand('SetFilling(rect2,0.35)');
+    // Result cylinder
+    api.evalCommand('cyl=Surface(r cos(u), r sin(u), v, u, 0, α, v, 0, h)');
+    api.evalCommand('SetColor(cyl,"cyan")');
+    api.evalCommand('SetFilling(cyl,0.3)');
+    // Base circles
+    api.evalCommand('cBot=Circle((0,0,0),(0,0,1),r)');
+    api.evalCommand('cTop=Circle((0,0,h),(0,0,1),r)');
   } else {
-    const r = 3, h = 5;
-    const sh = new THREE.Shape(); sh.moveTo(0, -h / 2); sh.lineTo(r, -h / 2); sh.lineTo(0, h / 2); sh.closePath();
-    shapeG.add(new THREE.Mesh(new THREE.ShapeGeometry(sh), new THREE.MeshBasicMaterial({ color: 0xf7971e, side: THREE.DoubleSide, transparent: true, opacity: 0.7 })));
-    shapeG.add(new THREE.Mesh(new THREE.ShapeGeometry(sh), new THREE.MeshBasicMaterial({ color: 0xffaa00, wireframe: true, transparent: true, opacity: 0.5 })));
+    api.evalCommand('r=3');
+    api.evalCommand('h=5');
+    // Original triangle
+    api.evalCommand('A1=(r,0,-h/2)');
+    api.evalCommand('tri1=Polygon((0,0,-h/2),A1,(0,0,h/2))');
+    api.evalCommand('SetColor(tri1,"orange")');
+    api.evalCommand('SetFilling(tri1,0.5)');
+    // Rotated triangle
+    api.evalCommand('A2=(r cos(α), r sin(α), -h/2)');
+    api.evalCommand('tri2=Polygon((0,0,-h/2),A2,(0,0,h/2))');
+    api.evalCommand('SetColor(tri2,"blue")');
+    api.evalCommand('SetFilling(tri2,0.35)');
+    // Result cone surface
+    api.evalCommand('coneSurf=Surface((1-v/(h/2+h/2)) r cos(u), (1-v/(h/2+h/2)) r sin(u), v, u, 0, α, v, -h/2, h/2)');
+    api.evalCommand('SetColor(coneSurf,"cyan")');
+    api.evalCommand('SetFilling(coneSurf,0.3)');
+    // Base
+    api.evalCommand('cBot=Circle((0,0,-h/2),(0,0,1),r)');
   }
+  // Show rotation axis label
+  api.evalCommand('SetVisibleInView(AxisLine,1,false)');
 }
 
-function buildTrail(ang) {
-  trailG.clear();
-  const r = 3, h = 5, steps = Math.floor((ang / (Math.PI * 2)) * 72);
-  const pts = []; for (let i = 0; i <= Math.min(steps, 72); i++) { const a = i * Math.PI * 2 / 72; pts.push(new THREE.Vector3(r * Math.cos(a), 0, r * Math.sin(a))); }
-  if (sweepMode === 'cylinder') {
-    for (let i = 0; i <= Math.min(steps, 72); i++) {
-      const a = i * Math.PI * 2 / 72;
-      trailG.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(r * Math.cos(a), -h / 2, r * Math.sin(a)), new THREE.Vector3(r * Math.cos(a), h / 2, r * Math.sin(a))]), new THREE.LineBasicMaterial({ color: 0x4fc3f7 })));
-    }
-  } else {
-    for (let i = 0; i <= Math.min(steps, 72); i++) {
-      const a = i * Math.PI * 2 / 72;
-      trailG.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(r * Math.cos(a), -h / 2, r * Math.sin(a)), new THREE.Vector3(0, h / 2, 0)]), new THREE.LineBasicMaterial({ color: 0x4fc3f7 })));
-    }
-  }
-  if (pts.length > 1) {
-    let ringPts; if (sweepMode === 'cylinder') ringPts = pts.map(p => new THREE.Vector3(p.x, -h / 2, p.z)); else ringPts = pts;
-    trailG.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(ringPts), new THREE.LineBasicMaterial({ color: 0x81d4fa })));
-    if (sweepMode === 'cylinder') trailG.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts.map(p => new THREE.Vector3(p.x, h / 2, p.z))), new THREE.LineBasicMaterial({ color: 0x81d4fa })));
-  }
-}
-
-document.getElementById('sweepPlayBtn').addEventListener('click', () => {
-  sweepPlaying = !sweepPlaying;
-  document.getElementById('sweepPlayBtn').textContent = sweepPlaying ? '⏸️ 暂停' : '▶️ 播放旋转动画';
-  if (sweepPlaying) { sweepAngle = 0; buildTrail(0); }
-});
-document.getElementById('sweepResetBtn').addEventListener('click', () => { sweepPlaying = false; sweepAngle = 0; shapeG.rotation.y = 0; document.getElementById('sweepPlayBtn').textContent = '▶️ 播放旋转动画'; buildTrail(0); });
-document.getElementById('sweepSpeed').addEventListener('input', () => { sweepSpeed = parseFloat(document.getElementById('sweepSpeed').value) / 100; });
 document.querySelector('#panel-rotate .mode-switch').addEventListener('click', e => {
   if (!e.target.classList.contains('mode-btn')) return;
   document.querySelectorAll('#panel-rotate .mode-btn').forEach(b => b.classList.remove('active'));
   e.target.classList.add('active');
   sweepMode = e.target.dataset.mode;
-  sweepPlaying = false; sweepAngle = 0; shapeG.rotation.y = 0;
-  document.getElementById('sweepPlayBtn').textContent = '▶️ 播放旋转动画';
-  makeSweep(); makeAxis(); buildTrail(0);
+  if (sweepApi) {
+    sweepApi.reset();
+    buildSweepScene();
+  }
 });
 
-makeSweep(); makeAxis();
+// ===== 3D 探究 =====
+let exploreShape = 'cylinder', exploreApi = null;
 
-// ========== 3D Explore ==========
-let exploreShape = 'cylinder', exploreCtrl, exploreReady = false;
-const exploreCanvas = document.getElementById('exploreCanvas');
-const exploreScene = new THREE.Scene(); exploreScene.background = new THREE.Color(0x1a1a2e);
-const exploreCam = new THREE.PerspectiveCamera(45, 800 / 500, 0.1, 50); exploreCam.position.set(8, 5, 8);
-const exploreR = new THREE.WebGLRenderer({ canvas: exploreCanvas, alpha: true, antialias: true }); exploreR.setSize(800, 500);
-exploreScene.add(new THREE.GridHelper(10, 10, 0x444444, 0x222222));
-exploreScene.add(new THREE.AmbientLight(0x666666, 2));
-const edl = new THREE.DirectionalLight(0xffffff, 2); edl.position.set(5, 10, 8); exploreScene.add(edl);
-const exploreGroup = new THREE.Group(); exploreScene.add(exploreGroup);
-
-function initExplore3D() {
-  if (exploreReady) return;
-  exploreReady = true;
-  exploreCtrl = new OrbitControls(exploreCam, exploreR.domElement);
-  exploreCtrl.enableDamping = true; exploreCtrl.autoRotate = true; exploreCtrl.autoRotateSpeed = 1;
+function initExplore() {
+  createApplet('explore', '3d', function(api) {
+    exploreApi = api;
+    buildExploreScene();
+    // Listen for slider changes
+    api.registerObjectUpdateListener('r', updateExploreData);
+    api.registerObjectUpdateListener('h', updateExploreData);
+  });
 }
 
-function buildExplore() {
-  exploreGroup.clear();
-  const r = parseFloat(document.getElementById('radiusInput').value) || 3;
-  const h = parseFloat(document.getElementById('heightInput').value) || 5;
-  const pi = Math.PI;
+function buildExploreScene() {
+  const api = exploreApi;
+  api.reset();
+  api.evalCommand('r=Slider(1,8,0.1)'); api.evalCommand('SetValue(r,3)');
+  api.evalCommand('h=Slider(1,12,0.1)'); api.evalCommand('SetValue(h,5)');
+  api.evalCommand('SetCaption(r,"半径 r")');
+  api.evalCommand('SetCaption(h,"高 h")');
   if (exploreShape === 'cylinder') {
-    exploreGroup.add(new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 48), new THREE.MeshPhongMaterial({ color: 0xf7971e, side: THREE.DoubleSide })));
-    document.getElementById('valLateral').textContent = (2 * pi * r * h).toFixed(2);
-    document.getElementById('valSurface').textContent = (2 * pi * r * r + 2 * pi * r * h).toFixed(2);
+    api.evalCommand('Cylinder((0,0,0),(0,0,h),r)');
   } else {
-    exploreGroup.add(new THREE.Mesh(new THREE.ConeGeometry(r, h, 48), new THREE.MeshPhongMaterial({ color: 0xf7971e, side: THREE.DoubleSide })));
-    const slant = Math.sqrt(r * r + h * h);
-    document.getElementById('valLateral').textContent = (pi * r * slant).toFixed(2);
-    document.getElementById('valSurface').textContent = (pi * r * r + pi * r * slant).toFixed(2);
+    api.evalCommand('Cone((0,0,-h/2),(0,0,h/2),r)');
   }
+  updateExploreData();
+}
+
+function updateExploreData() {
+  if (!exploreApi) return;
+  const r = exploreApi.getValue('r'), h = exploreApi.getValue('h'), pi = Math.PI;
   document.getElementById('valArea').textContent = (pi * r * r).toFixed(2);
-  document.getElementById('valCircum').textContent = (2 * pi * r).toFixed(2);
-  document.getElementById('valVolume').textContent = (exploreShape === 'cylinder' ? pi * r * r * h : pi * r * r * h / 3).toFixed(2);
+  if (exploreShape === 'cylinder') {
+    document.getElementById('valLateral').textContent = (2 * pi * r * h).toFixed(2);
+    document.getElementById('valVolume').textContent = (pi * r * r * h).toFixed(2);
+  } else {
+    const s = Math.sqrt(r * r + h * h);
+    document.getElementById('valLateral').textContent = (pi * r * s).toFixed(2);
+    document.getElementById('valVolume').textContent = (pi * r * r * h / 3).toFixed(2);
+  }
 }
 
-function syncSliderInput(sliderId, inputId, cb) {
-  const slider = document.getElementById(sliderId), input = document.getElementById(inputId);
-  slider.addEventListener('input', () => { input.value = slider.value; cb(); });
-  input.addEventListener('input', () => { let v = parseFloat(input.value); if (!isNaN(v)) { slider.value = v; cb(); } });
-}
-syncSliderInput('radiusSlider', 'radiusInput', buildExplore);
-syncSliderInput('heightSlider', 'heightInput', buildExplore);
-
-document.getElementById('exploreShapeSwitch').addEventListener('click', e => {
+document.querySelector('#panel-explore .mode-switch').addEventListener('click', e => {
   if (!e.target.classList.contains('mode-btn')) return;
-  document.querySelectorAll('#exploreShapeSwitch .mode-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#panel-explore .mode-btn').forEach(b => b.classList.remove('active'));
   e.target.classList.add('active');
   exploreShape = e.target.dataset.shape;
-  buildExplore();
+  if (exploreApi) buildExploreScene();
 });
-buildExplore();
 
-// ========== Unfold ==========
-let unfoldMode = 'cylinder', unfoldP = 0, unfoldT = 0;
-const unfoldCanvas = document.getElementById('unfoldCanvas');
-const unfoldScene = new THREE.Scene(); unfoldScene.background = new THREE.Color(0x1a1a2e);
-const unfoldCam = new THREE.PerspectiveCamera(50, 900 / 500, 0.1, 50); unfoldCam.position.set(0, 8, 12); unfoldCam.lookAt(0, 0, 0);
-const unfoldR = new THREE.WebGLRenderer({ canvas: unfoldCanvas, alpha: true, antialias: true }); unfoldR.setSize(900, 500);
-unfoldScene.add(new THREE.GridHelper(12, 12, 0x444444, 0x222222));
-unfoldScene.add(new THREE.AmbientLight(0x666666, 2));
-const udl = new THREE.DirectionalLight(0xffffff, 2); udl.position.set(5, 10, 8); unfoldScene.add(udl);
-const solidG = new THREE.Group(), flatG = new THREE.Group();
-unfoldScene.add(solidG); unfoldScene.add(flatG);
+// ===== 展开图 =====
+let unfoldShape = 'cylinder', unfoldApi = null;
 
-function buildUnfold() {
-  solidG.clear(); flatG.clear();
-  const r = parseFloat(document.getElementById('unfoldRadiusInput').value) || 3;
-  const h = parseFloat(document.getElementById('unfoldHeightInput').value) || 5;
-  if (unfoldMode === 'cylinder') {
-    solidG.add(new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 48), new THREE.MeshPhongMaterial({ color: 0xf7971e, side: THREE.DoubleSide, transparent: true, opacity: 0.7 })));
-    const cg = new THREE.CylinderGeometry(r, r, 0.05, 48), cm = new THREE.MeshPhongMaterial({ color: 0x4fc3f7 });
-    flatG.add(new THREE.Mesh(cg, cm).translateY(h / 2).translateX(4));
-    flatG.add(new THREE.Mesh(cg, cm).translateY(-h / 2).translateX(4));
-    const rw = 2 * Math.PI * r;
-    flatG.add(new THREE.Mesh(new THREE.PlaneGeometry(rw, h), new THREE.MeshPhongMaterial({ color: 0xffd200, side: THREE.DoubleSide })).translateX(4 + rw / 2 + r + 0.5));
-  } else {
-    solidG.add(new THREE.Mesh(new THREE.ConeGeometry(r, h, 48), new THREE.MeshPhongMaterial({ color: 0xf7971e, side: THREE.DoubleSide, transparent: true, opacity: 0.7 })));
-    flatG.add(new THREE.Mesh(new THREE.CylinderGeometry(r, r, 0.05, 48), new THREE.MeshPhongMaterial({ color: 0x4fc3f7 })).translateX(5).translateY(-h / 2));
-    const slant = Math.sqrt(r * r + h * h), arcA = (2 * Math.PI * r) / slant;
-    const sec = new THREE.Mesh(new THREE.CircleGeometry(slant, 48, 0, arcA), new THREE.MeshPhongMaterial({ color: 0xffd200, side: THREE.DoubleSide }));
-    sec.rotation.x = -Math.PI / 2; sec.position.set(5 + slant + 1, 0, 0); flatG.add(sec);
-  }
-  flatG.visible = false; unfoldP = 0; unfoldT = 0;
+function initUnfold() {
+  createApplet('unfold', '3d', function(api) {
+    unfoldApi = api;
+    buildUnfoldScene();
+  });
 }
 
-document.getElementById('unfoldBtn').addEventListener('click', () => {
-  unfoldT = unfoldT > 0.5 ? 0 : 1;
-  document.getElementById('unfoldBtn').textContent = unfoldT > 0.5 ? '📦 还原' : '📐 展开';
-});
-document.getElementById('unfoldResetBtn').addEventListener('click', () => { unfoldT = 0; unfoldP = 0; document.getElementById('unfoldBtn').textContent = '📐 展开'; });
-syncSliderInput('unfoldRadiusSlider', 'unfoldRadiusInput', buildUnfold);
-syncSliderInput('unfoldHeightSlider', 'unfoldHeightInput', buildUnfold);
-document.getElementById('unfoldShapeSwitch').addEventListener('click', e => {
+function buildUnfoldScene() {
+  const api = unfoldApi;
+  api.reset();
+  api.evalCommand('r=Slider(1,6,0.1)'); api.evalCommand('SetValue(r,3)');
+  api.evalCommand('h=Slider(1,10,0.1)'); api.evalCommand('SetValue(h,5)');
+  api.evalCommand('t=Slider(0,1,0.01)'); api.evalCommand('SetValue(t,0)');
+  api.evalCommand('SetCaption(r,"半径 r")');
+  api.evalCommand('SetCaption(h,"高 h")');
+  api.evalCommand('SetCaption(t,"展开程度 t")');
+
+  if (unfoldShape === 'cylinder') {
+    // Solid cylinder that fades as t increases
+    api.evalCommand('cyl=Cylinder((0,0,0),(0,0,h*(1-t)),r)');
+    // Upper base circle moves to the right as t increases
+    api.evalCommand('cUp=Circle((3+r*(1-t)+2*π*r*t, 0, h/2*t), (0,0,1), r)');
+    api.evalCommand('SetColor(cUp,"blue")');
+    // Lower base circle
+    api.evalCommand('cLo=Circle((3+r*(1-t)+2*π*r*t, 0, -h/2*t), (0,0,1), r)');
+    api.evalCommand('SetColor(cLo,"blue")');
+    // Lateral surface as rectangle (represented as a plane in 3D)
+    api.evalCommand('lateral=Translate(Polygon((3+r, -h/2, 0), (3+r, h/2, 0), (3+r, h/2, 2*π*r), (3+r, -h/2, 2*π*r)), Vector((0,0,0)))');
+    // Alternative: use a point and text for the lateral rectangle
+    api.evalCommand('rectLabel=Text("侧面展开后是长方形\\n长=底面周长=2πr="+(2π r)+"\\n宽=高=h="+h,(5+r,0,0))');
+  } else {
+    // Cone
+    api.evalCommand('cn=Cone((0,0,-h/2),(0,0,h/2*(1-t)),r*(1-t))');
+    // Base circle
+    api.evalCommand('cB=Circle((3+r,0,-h/2),(0,0,1),r)');
+    api.evalCommand('SetColor(cB,"blue")');
+    // Text info
+    api.evalCommand('slant=sqrt(r^2+h^2)');
+    api.evalCommand('arcAngle=2*π*r/slant');
+    api.evalCommand('infoLabel=Text("侧面展开后是扇形\\n半径=母线长="+slant+"\\n弧长=底面周长=2πr",(4+r,0,0))');
+  }
+}
+
+document.querySelector('#panel-unfold .mode-switch').addEventListener('click', e => {
   if (!e.target.classList.contains('mode-btn')) return;
-  document.querySelectorAll('#unfoldShapeSwitch .mode-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#panel-unfold .mode-btn').forEach(b => b.classList.remove('active'));
   e.target.classList.add('active');
-  unfoldMode = e.target.dataset.unfold;
-  buildUnfold();
+  unfoldShape = e.target.dataset.unfold;
+  if (unfoldApi) buildUnfoldScene();
 });
-buildUnfold();
 
-// ========== Volume ==========
-const volCanvas = document.getElementById('volumeCanvas');
-const volScene = new THREE.Scene(); volScene.background = new THREE.Color(0x1a1a2e);
-const volCam = new THREE.PerspectiveCamera(45, 900 / 500, 0.1, 50); volCam.position.set(4, 5, 10); volCam.lookAt(0, 0, 0);
-const volR = new THREE.WebGLRenderer({ canvas: volCanvas, alpha: true, antialias: true }); volR.setSize(900, 500);
-volScene.add(new THREE.GridHelper(10, 10, 0x444444, 0x222222));
-volScene.add(new THREE.AmbientLight(0x666666, 2));
-const vdl = new THREE.DirectionalLight(0xffffff, 2); vdl.position.set(5, 10, 8); volScene.add(vdl);
-const volG = new THREE.Group(); volScene.add(volG);
+// ===== 体积关系 =====
+let volumeApi = null;
+function initVolume() {
+  createApplet('volume', '3d', function(api) {
+    volumeApi = api;
+    buildVolumeScene();
+    api.registerObjectUpdateListener('r', updateVolumeData);
+    api.registerObjectUpdateListener('h', updateVolumeData);
+  });
+}
 
-function buildVolume() {
-  volG.clear();
-  const r = parseFloat(document.getElementById('volRadiusInput').value) || 3;
-  const h = parseFloat(document.getElementById('volHeightInput').value) || 5;
-  const pi = Math.PI, cylV = pi * r * r * h, coneV = cylV / 3;
-  volG.add(new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 48), new THREE.MeshPhongMaterial({ color: 0xf7971e, transparent: true, opacity: 0.8, side: THREE.DoubleSide })).translateX(-r - 1));
-  volG.add(new THREE.Mesh(new THREE.ConeGeometry(r, h, 48), new THREE.MeshPhongMaterial({ color: 0x4fc3f7, transparent: true, opacity: 0.8, side: THREE.DoubleSide })).translateX(r + 1));
+function buildVolumeScene() {
+  const api = volumeApi;
+  api.reset();
+  api.evalCommand('r=Slider(1,6,0.1)'); api.evalCommand('SetValue(r,3)');
+  api.evalCommand('h=Slider(1,10,0.1)'); api.evalCommand('SetValue(h,5)');
+  api.evalCommand('SetCaption(r,"半径 r")');
+  api.evalCommand('SetCaption(h,"高 h")');
+  // Cylinder on left
+  api.evalCommand('cyl=Cylinder((-r-1.5, 0, 0), (-r-1.5, 0, h), r)');
+  api.evalCommand('SetColor(cyl,"orange")');
+  api.evalCommand('SetFilling(cyl,0.7)');
+  // Cone on right
+  api.evalCommand('cn=Cone((r+1.5, 0, 0), (r+1.5, 0, h), r)');
+  api.evalCommand('SetColor(cn,"blue")');
+  api.evalCommand('SetFilling(cn,0.7)');
+  // Text
+  api.evalCommand('tCyl=Text("V柱 = πr²h",(-r-1.5,0,h+1))');
+  api.evalCommand('tCone=Text("V锥 = ⅓πr²h",(r+1.5,0,h+1))');
+  api.evalCommand('tRatio=Text("V柱 : V锥 = 3 : 1",(0,0,h+2.5))');
+  api.evalCommand('SetColor(tRatio,"gold")');
+  updateVolumeData();
+}
+
+function updateVolumeData() {
+  if (!volumeApi) return;
+  const r = volumeApi.getValue('r'), h = volumeApi.getValue('h'), pi = Math.PI;
+  const cylV = pi * r * r * h;
   document.getElementById('valCylVol').textContent = cylV.toFixed(2);
-  document.getElementById('valConeVol').textContent = coneV.toFixed(2);
+  document.getElementById('valConeVol').textContent = (cylV / 3).toFixed(2);
   document.getElementById('valRatio').textContent = '3 : 1';
 }
-syncSliderInput('volRadiusSlider', 'volRadiusInput', buildVolume);
-syncSliderInput('volHeightSlider', 'volHeightInput', buildVolume);
-buildVolume();
 
-// ========== Record ==========
+// ===== Record =====
 let volRecs = [];
+let recR = 3, recH = 5;
 document.getElementById('addRecordBtn').addEventListener('click', () => {
-  const r = parseFloat(document.getElementById('volRadiusInput').value) || 3;
-  const h = parseFloat(document.getElementById('volHeightInput').value) || 5;
-  const pi = Math.PI, base = pi * r * r, cylV = base * h;
-  volRecs.push({ r, h, base, cylV, coneV: cylV / 3 });
-  const tb = document.getElementById('recordTbody');
-  tb.innerHTML = volRecs.map((v, i) => `<tr><td>${i + 1}</td><td>${v.r.toFixed(1)}</td><td>${v.h.toFixed(1)}</td><td>${v.base.toFixed(2)}</td><td style="color:#ffd200">${v.cylV.toFixed(2)}</td><td style="color:#4fc3f7">${v.coneV.toFixed(2)}</td><td>3:1</td><td>${(v.r * v.r).toFixed(2)}</td><td>${(v.cylV / (v.r * v.r)).toFixed(2)}</td></tr>`).join('');
+  if (volumeApi) { recR = volumeApi.getValue('r'); recH = volumeApi.getValue('h'); }
+  const pi = Math.PI, base = pi * recR * recR, cylV = base * recH;
+  volRecs.push({ r: recR, h: recH, base, cylV, coneV: cylV / 3 });
+  document.getElementById('recordTbody').innerHTML = volRecs.map((v, i) =>
+    `<tr><td>${i+1}</td><td>${v.r.toFixed(1)}</td><td>${v.h.toFixed(1)}</td><td>${v.base.toFixed(2)}</td><td style="color:#ffd200">${v.cylV.toFixed(2)}</td><td style="color:#4fc3f7">${v.coneV.toFixed(2)}</td><td>3:1</td><td>${(v.r*v.r).toFixed(2)}</td><td>${(v.cylV/(v.r*v.r)).toFixed(2)}</td></tr>`
+  ).join('');
 });
 document.getElementById('clearRecordBtn').addEventListener('click', () => { volRecs = []; document.getElementById('recordTbody').innerHTML = '<tr><td colspan="9" style="color:#666;padding:30px;">已清空</td></tr>'; });
 document.getElementById('revealBtn2').addEventListener('click', () => { document.getElementById('knowledgeReveal2').style.display = 'block'; document.getElementById('revealBtn2').style.display = 'none'; });
 
-// ========== Game ==========
+// ===== Game =====
 let gs = 0, gt = 0, gA = false, gQ = null;
-function ri(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
-function sh(arr) { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function ri(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function sh(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
+
 function genQ() {
-  for (let t = 0; t < 50; t++) {
-    const tp = ri(1, 4); let q = null;
-    if (tp === 1) { const r = ri(1, 8), h = ri(2, 10), ans = Math.round(Math.PI * r * r * h * 100) / 100; const ws = new Set([ans]); while (ws.size < 4) ws.add(Math.round((ans + ri(-8, 8) * ri(1, 3)) * 100) / 100); q = { t: `底面半径 <b>${r}</b> cm，高 <b>${h}</b> cm 的圆柱，体积是多少 cm³？（π≈3.14）`, a: ans, opts: sh([...ws].filter(v => v > 0).slice(0, 4)) }; }
-    else if (tp === 2) { const r = ri(1, 6), h = ri(3, 12), ans = Math.round(Math.PI * r * r * h / 3 * 100) / 100; const ws = new Set([ans]); while (ws.size < 4) { let w = Math.round((ans + ri(-5, 5) * ri(1, 3)) * 100) / 100; if (w <= 0) w = Math.round(ans * ri(2, 5) * 100) / 100; ws.add(w); } q = { t: `底面半径 <b>${r}</b> cm，高 <b>${h}</b> cm 的圆锥，体积是多少 cm³？（π≈3.14）`, a: ans, opts: sh([...ws].filter(v => v > 0).slice(0, 4)) }; }
-    else if (tp === 3) { const r = ri(2, 6), h = ri(2, 8), v = Math.round(Math.PI * r * r * h * 100) / 100; const askR = Math.random() > 0.5; if (askR) { const ans = r; const ws = new Set([ans]); while (ws.size < 4) ws.add(ans + ri(-2, 4)); q = { t: `圆柱体积 <b>${v.toFixed(2)}</b> cm³，高 <b>${h}</b> cm。底面半径约多少 cm？`, a: ans, opts: sh([...ws].filter(x => x > 0).slice(0, 4)) }; } else { const ans = h; const ws = new Set([ans]); while (ws.size < 4) ws.add(ans + ri(-3, 6)); q = { t: `圆柱体积 <b>${v.toFixed(2)}</b> cm³，半径 <b>${r}</b> cm。高约多少 cm？`, a: ans, opts: sh([...ws].filter(x => x > 0).slice(0, 4)) }; } }
-    else { const r = ri(2, 7), h = ri(3, 9), cv = Math.round(Math.PI * r * r * h * 100) / 100, ans = Math.round(cv / 3 * 100) / 100; const ws = new Set([ans, Math.round(cv * 2 / 3 * 100) / 100, Math.round(cv * 0.4 * 100) / 100, Math.round(cv * 0.25 * 100) / 100]); q = { t: `底面半径 <b>${r}</b> cm，高 <b>${h}</b> cm 的圆锥。等底等高圆柱体积是 <b>${cv.toFixed(2)}</b> cm³。圆锥体积是？`, a: ans, opts: sh([...ws]) }; }
-    if (q && q.opts.length >= 3) return q;
+  for(let t=0;t<50;t++){
+    const tp=ri(1,4);let q=null;
+    if(tp===1){const r=ri(1,8),h=ri(2,10),ans=Math.round(Math.PI*r*r*h*100)/100;const ws=new Set([ans]);while(ws.size<4)ws.add(Math.round((ans+ri(-8,8)*ri(1,3))*100)/100);q={t:`底面半径 <b>${r}</b> cm，高 <b>${h}</b> cm 的圆柱，体积是多少 cm³？（π≈3.14）`,a:ans,opts:sh([...ws].filter(v=>v>0).slice(0,4))};}
+    else if(tp===2){const r=ri(1,6),h=ri(3,12),ans=Math.round(Math.PI*r*r*h/3*100)/100;const ws=new Set([ans]);while(ws.size<4){let w=Math.round((ans+ri(-5,5)*ri(1,3))*100)/100;if(w<=0)w=Math.round(ans*ri(2,5)*100)/100;ws.add(w);}q={t:`底面半径 <b>${r}</b> cm，高 <b>${h}</b> cm 的圆锥，体积是多少 cm³？（π≈3.14）`,a:ans,opts:sh([...ws].filter(v=>v>0).slice(0,4))};}
+    else if(tp===3){const r=ri(2,6),h=ri(2,8),v=Math.round(Math.PI*r*r*h*100)/100;if(Math.random()>0.5){const ws=new Set([r]);while(ws.size<4)ws.add(r+ri(-2,4));q={t:`圆柱体积 <b>${v.toFixed(2)}</b> cm³，高 <b>${h}</b> cm。底面半径约多少 cm？`,a:r,opts:sh([...ws].filter(x=>x>0).slice(0,4))};}else{const ws=new Set([h]);while(ws.size<4)ws.add(h+ri(-3,6));q={t:`圆柱体积 <b>${v.toFixed(2)}</b> cm³，半径 <b>${r}</b> cm。高约多少 cm？`,a:h,opts:sh([...ws].filter(x=>x>0).slice(0,4))};}}
+    else{const r=ri(2,7),h=ri(3,9),cv=Math.round(Math.PI*r*r*h*100)/100,ans=Math.round(cv/3*100)/100;q={t:`底面半径 <b>${r}</b> cm，高 <b>${h}</b> cm。等底等高圆柱体积 <b>${cv.toFixed(2)}</b> cm³。圆锥体积？`,a:ans,opts:sh([ans,Math.round(cv*2/3*100)/100,Math.round(cv*0.4*100)/100,Math.round(cv*0.25*100)/100])};}
+    if(q&&q.opts.length>=3)return q;
   }
-  return { t: '底面半径 3 cm，高 5 cm 的圆柱体积？', a: 141.3, opts: sh([141.3, 47.1, 94.2, 282.6]) };
+  return{t:'底面半径 3 cm，高 5 cm 的圆柱体积？',a:141.3,opts:sh([141.3,47.1,94.2,282.6])};
 }
 
-document.getElementById('startGameBtn2').addEventListener('click', () => { gs = 0; gt = 0; document.getElementById('gameScore').textContent = '0'; document.getElementById('gameTotal').textContent = '0'; document.getElementById('startGameBtn2').style.display = 'none'; document.getElementById('nextGameBtn2').style.display = 'inline-block'; nextQ(); });
-document.getElementById('nextGameBtn2').addEventListener('click', nextQ);
-function nextQ() {
-  gA = false; gQ = genQ();
-  document.getElementById('gameQuestion').innerHTML = gQ.t;
-  document.getElementById('gameFeedback').innerHTML = '';
-  document.getElementById('gameOptions').innerHTML = gQ.opts.map(o => `<button class="game-option">${(o === Math.floor(o) ? o : o.toFixed(2)).replace(/\.?0+$/, '')} cm³</button>`).join('');
-  document.querySelectorAll('.game-option').forEach((b, i) => b.addEventListener('click', () => ansQ(i, b)));
-}
-function ansQ(idx, btn) {
-  if (gA) return; gA = true; gt++;
-  const ok = Math.abs(gQ.opts[idx] - gQ.a) < 0.01;
-  if (ok) { gs++; btn.classList.add('correct'); document.getElementById('gameFeedback').innerHTML = '✅ 正确！'; }
-  else { btn.classList.add('wrong'); document.querySelectorAll('.game-option').forEach((b, i) => { if (Math.abs(gQ.opts[i] - gQ.a) < 0.01) b.classList.add('correct'); }); document.getElementById('gameFeedback').innerHTML = '❌ 再想想！'; }
-  document.getElementById('gameScore').textContent = gs; document.getElementById('gameTotal').textContent = gt;
-  document.querySelectorAll('.game-option').forEach(b => b.style.pointerEvents = 'none');
+document.getElementById('startGameBtn2').addEventListener('click',()=>{gs=0;gt=0;document.getElementById('gameScore').textContent='0';document.getElementById('gameTotal').textContent='0';document.getElementById('startGameBtn2').style.display='none';document.getElementById('nextGameBtn2').style.display='inline-block';nextQ();});
+document.getElementById('nextGameBtn2').addEventListener('click',nextQ);
+
+function nextQ(){gA=false;gQ=genQ();document.getElementById('gameQuestion').innerHTML=gQ.t;document.getElementById('gameFeedback').innerHTML='';document.getElementById('gameOptions').innerHTML=gQ.opts.map(o=>`<button class="game-option">${(o===Math.floor(o)?o:o.toFixed(2)).replace(/\.?0+$/,'')} cm³</button>`).join('');document.querySelectorAll('.game-option').forEach((b,i)=>b.addEventListener('click',()=>ansQ(i,b)));}
+
+function ansQ(idx,btn){if(gA)return;gA=true;gt++;const ok=Math.abs(gQ.opts[idx]-gQ.a)<0.01;if(ok){gs++;btn.classList.add('correct');document.getElementById('gameFeedback').innerHTML='✅ 正确！';}else{btn.classList.add('wrong');document.querySelectorAll('.game-option').forEach((b,i)=>{if(Math.abs(gQ.opts[i]-gQ.a)<0.01)b.classList.add('correct');});document.getElementById('gameFeedback').innerHTML='❌ 再想想！';}document.getElementById('gameScore').textContent=gs;document.getElementById('gameTotal').textContent=gt;document.querySelectorAll('.game-option').forEach(b=>b.style.pointerEvents='none');}
+
+// ===== Init =====
+function initApplet(tab) {
+  appletsLoaded[tab] = true;
+  setTimeout(() => {
+    if (tab === 'rotate') initSweep();
+    else if (tab === 'explore') initExplore();
+    else if (tab === 'unfold') initUnfold();
+    else if (tab === 'volume') initVolume();
+  }, 100);
 }
 
-// ========== Resize ==========
-function resizeAll() {
-  const ps = [[sweepCanvas, sweepR, 900, 500], [exploreCanvas, exploreR, 800, 500], [unfoldCanvas, unfoldR, 900, 500], [volCanvas, volR, 900, 500]];
-  ps.forEach(([c, r, w, h]) => { const p = c.parentElement; if (!p) return; const mw = Math.min(p.clientWidth - 32, w), s = mw / w; c.style.width = mw + 'px'; c.style.height = (h * s) + 'px'; r.setSize(mw, h * s, false); });
-}
-window.addEventListener('resize', resizeAll);
-resizeAll();
+// Start with sweep
+initApplet('rotate');
 
-// ========== Loop ==========
-function loop() {
-  requestAnimationFrame(loop);
-  if (currentTab === 'rotate') {
-    if (sweepPlaying && sweepAngle < Math.PI * 2.1) {
-      sweepAngle += sweepSpeed; shapeG.rotation.y = sweepAngle; buildTrail(sweepAngle);
-      if (sweepAngle >= Math.PI * 2) { sweepPlaying = false; sweepAngle = Math.PI * 2; document.getElementById('sweepPlayBtn').textContent = '▶️ 播放旋转动画'; buildTrail(Math.PI * 2); }
-    }
-    sweepR.render(sweepScene, sweepCam);
-  } else if (currentTab === 'explore' && exploreReady) {
-    exploreCtrl.update(); exploreR.render(exploreScene, exploreCam);
-  } else if (currentTab === 'unfold') {
-    if (Math.abs(unfoldP - unfoldT) > 0.001) { unfoldP += (unfoldT - unfoldP) * 0.06; solidG.scale.setScalar(1 - unfoldP); flatG.scale.setScalar(unfoldP); flatG.visible = unfoldP > 0.01; solidG.visible = unfoldP < 0.99; }
-    unfoldR.render(unfoldScene, unfoldCam);
-  } else if (currentTab === 'volume') {
-    volG.rotation.y += 0.005; volR.render(volScene, volCam);
-  }
-}
-loop();
+window.addEventListener('resize', () => {
+  if (applets[currentTab]) resizeApplet(currentTab);
+});
 </script>
 </body>
 </html>
