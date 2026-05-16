@@ -1,0 +1,120 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: "PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  color: #e0e0e0;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+
+header { text-align: center; padding: 30px 10px 10px; }
+header h1 {
+  font-size: 2.3em; background: linear-gradient(90deg, #f7971e, #ffd200);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 6px;
+}
+header .subtitle { font-size: 1em; color: #aaa; }
+
+.tabs {
+  display: flex; justify-content: center; gap: 0; margin: 20px 0;
+  border-radius: 14px; overflow: hidden; background: rgba(255,255,255,0.05);
+  width: fit-content; margin-left: auto; margin-right: auto;
+  flex-wrap: wrap;
+}
+.tab-btn {
+  padding: 10px 20px; border: none; color: #aaa; background: transparent;
+  cursor: pointer; font-size: 14px; transition: all 0.3s; font-family: inherit;
+}
+.tab-btn.active { background: linear-gradient(135deg, #f7971e, #ff6a00); color: #fff; }
+.tab-btn:hover:not(.active) { color: #fff; background: rgba(255,255,255,0.08); }
+
+.panel { display: none; animation: fadeIn 0.4s ease; }
+.panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.mode-switch { display: flex; justify-content: center; gap: 8px; margin: 15px 0; }
+.mode-btn {
+  padding: 8px 22px; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px;
+  color: #aaa; background: rgba(255,255,255,0.03); cursor: pointer;
+  font-size: 14px; font-family: inherit; transition: all 0.3s;
+}
+.mode-btn.active { border-color: #f7971e; color: #f7971e; background: rgba(247,151,30,0.1); }
+.mode-btn:hover:not(.active) { border-color: rgba(255,255,255,0.3); color: #ddd; }
+
+.canvas-area {
+  background: rgba(255,255,255,0.03); border-radius: 20px; padding: 16px;
+  margin: 15px 0; text-align: center; border: 1px solid rgba(255,255,255,0.06);
+}
+canvas { display: block; margin: 0 auto; max-width: 100%; }
+
+.sweep-controls { display: flex; justify-content: center; align-items: center; gap: 12px; margin: 12px 0; flex-wrap: wrap; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items: flex-start; margin: 15px 0; }
+.control-card {
+  background: rgba(255,255,255,0.05); border-radius: 16px; padding: 16px 24px;
+  border: 1px solid rgba(255,255,255,0.08); min-width: 240px; flex: 1; max-width: 340px;
+}
+.control-card h3 { font-size: 15px; margin-bottom: 10px; color: #f7971e; text-align: center; }
+.control-row { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
+.control-row input[type="range"] { flex: 1; accent-color: #f7971e; height: 6px; min-width: 60px; }
+.control-row input[type="number"] {
+  width: 56px; padding: 5px 6px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.06); color: #fff; font-size: 14px;
+  text-align: center; font-family: inherit; flex-shrink: 0;
+}
+.control-row .unit { color: #aaa; font-size: 13px; flex-shrink: 0; }
+
+.data-row { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin: 12px 0; }
+.data-item {
+  background: rgba(255,255,255,0.05); border-radius: 12px; padding: 12px 18px;
+  text-align: center; min-width: 110px; border: 1px solid rgba(255,255,255,0.08);
+}
+.data-item .label { font-size: 12px; color: #888; margin-bottom: 4px; }
+.data-item .value { font-size: 22px; font-weight: bold; background: linear-gradient(90deg, #f7971e, #ffd200); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.data-item .unit { font-size: 11px; color: #666; }
+
+.record-table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px; }
+.record-table th, .record-table td { padding: 8px 10px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+.record-table th { background: rgba(255,255,255,0.08); color: #f7971e; font-weight: normal; }
+.record-table tr:hover td { background: rgba(255,255,255,0.03); }
+
+.btn { padding: 10px 22px; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-family: inherit; transition: all 0.3s; font-weight: bold; }
+.btn-primary { background: linear-gradient(135deg, #f7971e, #ff6a00); color: #fff; }
+.btn-primary:hover { opacity: 0.85; transform: translateY(-1px); }
+.btn-outline { background: transparent; border: 1px solid #f7971e; color: #f7971e; }
+.btn-outline:hover { background: rgba(247,151,30,0.1); }
+.btn-sm { padding: 5px 14px; font-size: 13px; }
+
+.info-box {
+  background: rgba(247,151,30,0.1); border-left: 3px solid #f7971e;
+  border-radius: 0 10px 10px 0; padding: 14px 18px; margin: 15px 0;
+  font-size: 14px; line-height: 1.9;
+}
+.info-box .highlight { color: #f7971e; font-weight: bold; }
+
+.game-score { text-align: center; font-size: 18px; margin: 10px 0; color: #bbb; }
+
+.game-question {
+  background: rgba(255,255,255,0.05); border-radius: 16px; padding: 24px;
+  margin: 15px 0; text-align: center; border: 1px solid rgba(255,255,255,0.08);
+}
+.game-question .q-text { font-size: 18px; margin-bottom: 18px; line-height: 1.7; }
+.game-options { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.game-option {
+  padding: 14px 24px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.05); color: #ddd; cursor: pointer;
+  font-size: 16px; font-family: inherit; transition: all 0.3s; min-width: 90px;
+}
+.game-option:hover { border-color: #f7971e; background: rgba(247,151,30,0.15); }
+.game-option.correct { border-color: #4caf50; background: rgba(76,175,80,0.25); color: #81c784; }
+.game-option.wrong { border-color: #f44336; background: rgba(244,67,54,0.25); color: #ef9a9a; }
+.game-feedback { margin-top: 14px; font-size: 16px; min-height: 50px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px; }
+
+@media (max-width: 768px) {
+  header h1 { font-size: 1.5em; }
+  .tab-btn { padding: 6px 12px; font-size: 12px; }
+  .control-card { max-width: 100%; padding: 14px 16px; }
+}

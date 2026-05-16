@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>圆柱与圆锥 — 数学探究实验室</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>🔷 圆柱与圆锥</h1>
+    <div class="subtitle">沪教版数学·六年级下册 第八章 — 探究立体图形的奥秘</div>
+  </header>
+
+  <div class="tabs" id="tabBar">
+    <button class="tab-btn active" data-tab="rotate">🔄 面动成体</button>
+    <button class="tab-btn" data-tab="explore">🔍 3D 探究</button>
+    <button class="tab-btn" data-tab="unfold">📐 展开图</button>
+    <button class="tab-btn" data-tab="volume">⚖️ 体积关系</button>
+    <button class="tab-btn" data-tab="record">📊 数据记录</button>
+    <button class="tab-btn" data-tab="game">🎮 闯关挑战</button>
+  </div>
+
+  <!-- ===== 面动成体 ===== -->
+  <div class="panel active" id="panel-rotate">
+    <div class="mode-switch">
+      <button class="mode-btn active" data-mode="cylinder">🔵 长方形 → 圆柱</button>
+      <button class="mode-btn" data-mode="cone">🔺 直角三角形 → 圆锥</button>
+    </div>
+    <div class="canvas-area">
+      <canvas id="sweepCanvas" width="900" height="500"></canvas>
+    </div>
+    <div class="sweep-controls">
+      <button class="btn btn-primary" id="sweepPlayBtn" onclick="toggleSweep()">▶️ 播放旋转动画</button>
+      <button class="btn btn-outline" onclick="resetSweep()">🔄 重置</button>
+      <label style="color:#bbb;font-size:14px;margin-left:12px;">速度：</label>
+      <input type="range" min="1" max="20" value="5" id="sweepSpeed" oninput="updateSweepSpeed()" style="width:120px;">
+    </div>
+    <div class="info-box">
+      <strong>💡 面动成体原理：</strong><br>
+      🔵 一个<span class="highlight">长方形</span>以它的一条边所在直线为轴，旋转一周就形成了<span class="highlight">圆柱</span>。<br>
+      🔺 一个<span class="highlight">直角三角形</span>以它的一条直角边所在直线为轴，旋转一周就形成了<span class="highlight">圆锥</span>。
+    </div>
+  </div>
+
+  <!-- ===== 3D 探究 ===== -->
+  <div class="panel" id="panel-explore">
+    <div class="mode-switch">
+      <button class="mode-btn active" data-shape="cylinder">🔵 圆柱</button>
+      <button class="mode-btn" data-shape="cone">🔺 圆锥</button>
+    </div>
+    <div class="canvas-area" id="explore3dArea">
+      <canvas id="exploreCanvas" width="800" height="500"></canvas>
+    </div>
+    <div class="controls">
+      <div class="control-card" style="border-left:3px solid #f7971e;">
+        <h3>底面半径 r</h3>
+        <div class="control-row">
+          <input type="range" min="1" max="8" value="3" step="0.1" id="radiusSlider" oninput="updateExploreParams()">
+          <input type="number" min="0.5" max="8" value="3" step="0.1" id="radiusInput" oninput="updateExploreParams()">
+          <span class="unit">cm</span>
+        </div>
+      </div>
+      <div class="control-card" style="border-left:3px solid #4fc3f7;">
+        <h3>高 h</h3>
+        <div class="control-row">
+          <input type="range" min="1" max="12" value="5" step="0.1" id="heightSlider" oninput="updateExploreParams()">
+          <input type="number" min="0.5" max="12" value="5" step="0.1" id="heightInput" oninput="updateExploreParams()">
+          <span class="unit">cm</span>
+        </div>
+      </div>
+    </div>
+    <div class="data-row" id="exploreData">
+      <div class="data-item"><div class="label">底面积 S底</div><div class="value" id="valArea">28.27</div><div class="unit">cm²</div></div>
+      <div class="data-item"><div class="label">底面周长 C</div><div class="value" id="valCircum">18.85</div><div class="unit">cm</div></div>
+      <div class="data-item"><div class="label">侧面积 S侧</div><div class="value" id="valLateral">94.25</div><div class="unit">cm²</div></div>
+      <div class="data-item"><div class="label">表面积 S表</div><div class="value" id="valSurface">150.80</div><div class="unit">cm²</div></div>
+      <div class="data-item"><div class="label">体积 V</div><div class="value" id="valVolume">141.37</div><div class="unit">cm³</div></div>
+    </div>
+  </div>
+
+  <!-- ===== 展开图 ===== -->
+  <div class="panel" id="panel-unfold">
+    <div class="mode-switch">
+      <button class="mode-btn active" data-unfold="cylinder">🔵 圆柱展开</button>
+      <button class="mode-btn" data-unfold="cone">🔺 圆锥展开</button>
+    </div>
+    <div class="canvas-area">
+      <canvas id="unfoldCanvas" width="900" height="500"></canvas>
+    </div>
+    <div class="sweep-controls">
+      <button class="btn btn-primary" id="unfoldBtn" onclick="toggleUnfold()">📐 展开</button>
+      <button class="btn btn-outline" onclick="resetUnfold()">🔄 还原</button>
+    </div>
+    <div class="controls">
+      <div class="control-card" style="border-left:3px solid #f7971e;">
+        <h3>底面半径 r</h3>
+        <div class="control-row">
+          <input type="range" min="1" max="6" value="3" step="0.1" id="unfoldRadiusSlider" oninput="updateUnfoldParams()">
+          <input type="number" min="0.5" max="6" value="3" step="0.1" id="unfoldRadiusInput" oninput="updateUnfoldParams()">
+          <span class="unit">cm</span>
+        </div>
+      </div>
+      <div class="control-card" style="border-left:3px solid #4fc3f7;">
+        <h3>高 h</h3>
+        <div class="control-row">
+          <input type="range" min="1" max="10" value="5" step="0.1" id="unfoldHeightSlider" oninput="updateUnfoldParams()">
+          <input type="number" min="0.5" max="10" value="5" step="0.1" id="unfoldHeightInput" oninput="updateUnfoldParams()">
+          <span class="unit">cm</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 体积关系 ===== -->
+  <div class="panel" id="panel-volume">
+    <div class="canvas-area">
+      <canvas id="volumeCanvas" width="900" height="500"></canvas>
+    </div>
+    <div class="controls">
+      <div class="control-card" style="border-left:3px solid #f7971e;">
+        <h3>底面半径 r</h3>
+        <div class="control-row">
+          <input type="range" min="1" max="6" value="3" step="0.1" id="volRadiusSlider" oninput="updateVolumeParams()">
+          <input type="number" min="0.5" max="6" value="3" step="0.1" id="volRadiusInput" oninput="updateVolumeParams()">
+          <span class="unit">cm</span>
+        </div>
+      </div>
+      <div class="control-card" style="border-left:3px solid #4fc3f7;">
+        <h3>高 h</h3>
+        <div class="control-row">
+          <input type="range" min="1" max="10" value="5" step="0.1" id="volHeightSlider" oninput="updateVolumeParams()">
+          <input type="number" min="0.5" max="10" value="5" step="0.1" id="volHeightInput" oninput="updateVolumeParams()">
+          <span class="unit">cm</span>
+        </div>
+      </div>
+    </div>
+    <div class="data-row">
+      <div class="data-item"><div class="label">圆柱体积 V柱</div><div class="value" id="valCylVol">141.37</div><div class="unit">cm³</div></div>
+      <div class="data-item"><div class="label">圆锥体积 V锥</div><div class="value" id="valConeVol">47.12</div><div class="unit">cm³</div></div>
+      <div class="data-item"><div class="label">V柱 : V锥</div><div class="value" id="valRatio">3 : 1</div></div>
+    </div>
+    <div class="info-box">
+      <strong>💡 核心规律：</strong><br>
+      等底等高的<span class="highlight">圆柱体积 = 圆锥体积的 3 倍</span>，即 <span class="highlight">V锥 = ⅓ V柱 = ⅓ πr²h</span>
+    </div>
+  </div>
+
+  <!-- ===== 数据记录 ===== -->
+  <div class="panel" id="panel-record">
+    <div style="text-align:center;margin:15px 0;">
+      <button class="btn btn-primary" onclick="addVolRecord()">📝 记录当前参数</button>
+      <button class="btn btn-outline" onclick="clearVolRecords()" style="margin-left:10px;">🗑️ 清空</button>
+    </div>
+    <table class="record-table" id="recordTable">
+      <thead>
+        <tr><th>#</th><th>r (cm)</th><th>h (cm)</th><th>S底 (cm²)</th><th>V柱 (cm³)</th><th>V锥 (cm³)</th><th>V柱:V锥</th><th>r²</th><th>V柱/r²</th></tr>
+      </thead>
+      <tbody id="recordTbody">
+        <tr><td colspan="9" style="color:#666;padding:30px;">在"体积关系"中调整半径和高后，点击记录</td></tr>
+      </tbody>
+    </table>
+    <div class="info-box">
+      <strong>📐 探究任务：</strong><br>
+      1. 保持高不变，半径扩大2倍，体积扩大几倍？<br>
+      2. 保持半径不变，高扩大2倍，体积扩大几倍？<br>
+      3. 观察 <span class="highlight">V柱 : V锥</span> 是否始终为 3:1？
+    </div>
+    <div style="margin:15px 0;padding:16px;background:rgba(76,175,80,0.08);border-radius:12px;border:1px solid rgba(76,175,80,0.2);">
+      <strong style="color:#81c784;">📖 知识点：</strong>
+      <div style="margin-top:10px;line-height:1.9;font-size:14px;display:none;" id="knowledgeReveal2">
+        🔹 <span class="highlight">V柱 = πr²h</span> — 圆柱体积 = 底面积 × 高<br>
+        🔹 <span class="highlight">V锥 = ⅓πr²h</span> — 圆锥体积 = ⅓ × 底面积 × 高<br>
+        🔹 等底等高时：<span class="highlight">V柱 = 3 × V锥</span><br>
+        🔹 高不变时，体积与<span class="highlight">r²</span> 成正比（r×2 → V×4）<br>
+        🔹 半径不变时，体积与<span class="highlight">h</span> 成正比（h×2 → V×2）
+      </div>
+      <button class="btn btn-sm btn-outline" onclick="revealVolKnowledge()" style="margin-top:10px;" id="revealBtn2">🔓 查看规律</button>
+    </div>
+  </div>
+
+  <!-- ===== 闯关挑战 ===== -->
+  <div class="panel" id="panel-game">
+    <div class="game-score">
+      🏆 得分：<span id="gameScore" style="color:#ffd200;font-size:28px;">0</span> / <span id="gameTotal">0</span>
+    </div>
+    <div class="game-question">
+      <div class="q-text" id="gameQuestion">点击"开始挑战"</div>
+      <div class="game-options" id="gameOptions"></div>
+      <div class="game-feedback" id="gameFeedback"></div>
+    </div>
+    <div style="text-align:center;margin:15px 0;">
+      <button class="btn btn-primary" id="startGameBtn2" onclick="startVolGame()">🎯 开始挑战</button>
+      <button class="btn btn-outline" id="nextGameBtn2" onclick="nextVolQuestion()" style="display:none;margin-left:10px;">▶️ 下一题</button>
+    </div>
+  </div>
+
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+</script>
+<script src="js/script.js"></script>
+</body>
+</html>
